@@ -963,7 +963,7 @@
 
           <div class="stat-card">
             <div class="stat-header">
-              <span class="stat-label">이번 달 VX 유통량</span>
+              <span class="stat-label">이번 달 VX 판매량</span>
               <div class="stat-icon cyan">🪙</div>
             </div>
             <div class="stat-value">3,486,200 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">VX</span></div>
@@ -1008,7 +1008,7 @@
               </div>
               <div style="display:flex;gap:12px;align-items:center;">
                 <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)">
-                  <span style="width:8px;height:8px;background:var(--purple-500);border-radius:2px;display:inline-block"></span>VX 유통량
+                  <span style="width:8px;height:8px;background:var(--purple-500);border-radius:2px;display:inline-block"></span>VX 판매량
                 </span>
                 <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)">
                   <span style="width:8px;height:8px;background:var(--cyan-400);border-radius:2px;display:inline-block"></span>기여금
@@ -1023,7 +1023,7 @@
                 <div class="breakdown-item">
                   <div class="breakdown-label">
                     <span class="breakdown-dot" style="background:var(--purple-500)"></span>
-                    VX 유통량
+                    VX 판매량
                   </div>
                   <div class="breakdown-value">3,486,200 VX</div>
                 </div>
@@ -2216,7 +2216,7 @@
       labels: ['12월','1월','2월','3월','4월','5월'],
       datasets: [
         {
-          label: 'VX 유통량',
+          label: 'VX 판매량',
           data: [2320, 2610, 2980, 3140, 3486, 1820],
           backgroundColor: 'rgba(139,92,246,0.4)',
           borderColor: 'rgba(139,92,246,0.8)',
@@ -2250,7 +2250,7 @@
           titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12,
           callbacks: {
             label: c => c.datasetIndex===0
-              ? `  VX 유통량: ${(c.parsed.y*1000).toLocaleString()} VX`
+              ? `  VX 판매량: ${(c.parsed.y*1000).toLocaleString()} VX`
               : `  예상 기여금: ~$${(c.parsed.y).toLocaleString()}`
           }
         }
@@ -2272,7 +2272,7 @@
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
           ${[
             {label:'이번 달 예상 기여금',val:'~$2,951',sub:'+12.4% 전월 대비',color:'#34d399',icon:'🏦'},
-            {label:'이번 달 VX 유통량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#22d3ee',icon:'🪙'},
+            {label:'이번 달 VX 판매량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#22d3ee',icon:'🪙'},
             {label:'총 플레이 수',val:'752,000',sub:'+12.1% 전월 대비',color:'#a78bfa',icon:'🎮'},
             {label:'활성 유저',val:'48,320',sub:'+9.3% 전월 대비',color:'#fb923c',icon:'👥'},
           ].map(c=>`
