@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verse8 — 정산 관리</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* ═══════════════════════════════════════════
+       VERSE8 DESIGN TOKENS
+    ═══════════════════════════════════════════ */
+    :root {
+      --bg-base:       #07070f;
+      --bg-surface:    #0f0f1c;
+      --bg-card:       #13132200;
+      --bg-card-solid: #131322;
+      --bg-hover:      #1c1c32;
+      --bg-input:      #0f0f1e;
+
+      --border:        rgba(139, 92, 246, 0.15);
+      --border-strong: rgba(139, 92, 246, 0.35);
+
+      --purple-500:    #8b5cf6;
+      --purple-400:    #a78bfa;
+      --purple-600:    #7c3aed;
+      --cyan-400:      #22d3ee;
+      --cyan-500:      #06b6d4;
+      --green-400:     #34d399;
+      --green-500:     #10b981;
+      --red-400:       #f87171;
+      --orange-400:    #fb923c;
+      --yellow-400:    #fbbf24;
+
+      --grad-primary:  linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
+      --grad-card:     linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(34,211,238,0.05) 100%);
+      --grad-purple:   linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+      --grad-text:     linear-gradient(90deg, #a78bfa 0%, #22d3ee 100%);
+
+      --text-primary:  #f1f0ff;
+      --text-secondary:#94a3b8;
+      --text-muted:    #4b5563;
+      --text-disabled: #374151;
+
+      --radius-sm:  6px;
+      --radius-md:  10px;
+      --radius-lg:  14px;
+      --radius-xl:  20px;
+
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(139,92,246,0.08);
+      --shadow-glow: 0 0 24px rgba(139,92,246,0.25);
+
+      --sidebar-w: 240px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      height: 100%;
+      overflow-x: hidden;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 2px; }
+
+    /* ═══════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════ */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ─── SIDEBAR ─── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      padding: 24px 20px 20px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--grad-primary);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 800; color: #fff;
+    }
+    .logo-text {
+      font-size: 17px; font-weight: 700;
+      background: var(--grad-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-badge {
+      margin-left: auto;
+      font-size: 9px; font-weight: 600;
+      padding: 2px 6px;
+      background: rgba(139,92,246,0.2);
+      border: 1px solid rgba(139,92,246,0.35);
+      border-radius: 4px;
+      color: var(--purple-400);
+      letter-spacing: 0.5px;
+    }
+
+    .workspace-info {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .workspace-label {
+      font-size: 10px; font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+    .workspace-name {
+      font-size: 13px; font-weight: 600;
+      color: var(--text-primary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .workspace-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green-400);
+      box-shadow: 0 0 6px rgba(52,211,153,0.6);
+    }
+
+    .sidebar-nav { padding: 12px 0; flex: 1; }
+
+    .nav-group-label {
+      padding: 10px 20px 6px;
+      font-size: 10px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 2px solid transparent;
+      text-decoration: none;
+      position: relative;
+    }
+    .nav-item:hover {
+      color: var(--text-primary);
+      background: rgba(139,92,246,0.06);
+    }
+    .nav-item.active {
+      color: var(--purple-400);
+      background: rgba(139,92,246,0.1);
+      border-left-color: var(--purple-500);
+    }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+    .nav-badge {
+      margin-left: auto;
+      background: rgba(139,92,246,0.25);
+      color: var(--purple-400);
+      font-size: 10px; font-weight: 600;
+      padding: 1px 6px; border-radius: 10px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .user-profile {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--grad-primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: white;
+      flex-shrink: 0;
+    }
+    .user-info { min-width: 0; }
+    .user-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .user-role { font-size: 11px; color: var(--text-muted); }
+
+    /* ─── MAIN ─── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── TOPBAR ─── */
+    .topbar {
+      height: 60px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px;
+      gap: 12px;
+      position: sticky; top: 0;
+      z-index: 50;
+    }
+    .topbar-title {
+      font-size: 15px; font-weight: 600;
+      color: var(--text-primary);
+    }
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .topbar-divider {
+      width: 1px; height: 18px;
+      background: var(--border);
+    }
+    .topbar-spacer { flex: 1; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none; text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--grad-purple);
+      color: white;
+      box-shadow: 0 2px 12px rgba(139,92,246,0.35);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 4px 20px rgba(139,92,246,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+    }
+
+    .tab-list {
+      display: flex; gap: 4px;
+      background: var(--bg-base);
+      border-radius: var(--radius-sm);
+      padding: 3px;
+      border: 1px solid var(--border);
+    }
+    .tab-item {
+      padding: 5px 12px;
+      font-size: 12px; font-weight: 500;
+      border-radius: 4px;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .tab-item.active {
+      background: rgba(139,92,246,0.2);
+      color: var(--purple-400);
+    }
+    .tab-item:hover:not(.active) { color: var(--text-secondary); }
+
+    /* ─── CONTENT ─── */
+    .content { padding: 24px 28px; flex: 1; }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .page-title {
+      font-size: 22px; font-weight: 700;
+      color: var(--text-primary);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-title-badge {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 8px;
+      background: rgba(52,211,153,0.15);
+      border: 1px solid rgba(52,211,153,0.3);
+      border-radius: 20px;
+      color: var(--green-400);
+      letter-spacing: 0.3px;
+    }
+    .page-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .page-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* ─── DATE FILTER ─── */
+    .date-filter {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin-bottom: 20px;
+    }
+    .date-filter-label {
+      font-size: 12px; color: var(--text-muted); font-weight: 500;
+    }
+    .date-pills { display: flex; gap: 4px; }
+    .date-pill {
+      padding: 4px 10px;
+      font-size: 11px; font-weight: 500;
+      border-radius: 20px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      background: transparent;
+      transition: all 0.12s;
+    }
+    .date-pill.active {
+      background: rgba(139,92,246,0.2);
+      border-color: var(--border-strong);
+      color: var(--purple-400);
+    }
+    .date-pill:hover:not(.active) {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+    }
+    .date-custom {
+      display: flex; align-items: center; gap: 6px;
+      margin-left: auto;
+    }
+    .date-input {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      font-size: 12px; color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+    }
+    .date-input:focus { border-color: var(--border-strong); }
+    .date-sep { font-size: 12px; color: var(--text-muted); }
+
+    /* ─── STAT CARDS ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad-primary);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .stat-card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-card);
+      transform: translateY(-2px);
+    }
+    .stat-card:hover::before { opacity: 1; }
+
+    .stat-card.highlight {
+      background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(34,211,238,0.05) 100%);
+      border-color: rgba(139,92,246,0.3);
+    }
+    .stat-card.highlight::before { opacity: 1; }
+
+    .stat-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .stat-label {
+      font-size: 12px; font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .stat-icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .stat-icon.purple { background: rgba(139,92,246,0.15); }
+    .stat-icon.cyan   { background: rgba(34,211,238,0.12); }
+    .stat-icon.green  { background: rgba(52,211,153,0.12); }
+    .stat-icon.orange { background: rgba(251,146,60,0.12); }
+
+    .stat-value {
+      font-size: 26px; font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-value.gradient {
+      background: var(--grad-text);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-unit {
+      font-size: 14px; font-weight: 500; margin-left: 2px;
+    }
+    .stat-meta {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 11px; color: var(--text-muted);
+    }
+    .stat-change {
+      display: flex; align-items: center; gap: 2px;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 6px; border-radius: 4px;
+    }
+    .stat-change.up {
+      background: rgba(52,211,153,0.12);
+      color: var(--green-400);
+    }
+    .stat-change.down {
+      background: rgba(248,113,113,0.12);
+      color: var(--red-400);
+    }
+
+    /* ─── TWO COL LAYOUT ─── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--bg-card-solid);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-title {
+      font-size: 14px; font-weight: 600;
+      color: var(--text-primary);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--purple-500);
+    }
+    .card-body { padding: 20px; }
+
+    /* ─── CHART AREA ─── */
+    .chart-container {
+      position: relative;
+      height: 200px;
+    }
+
+    /* ─── SCHEDULE TIMELINE ─── */
+    .schedule-list { display: flex; flex-direction: column; gap: 0; }
+    .schedule-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .schedule-item:last-child { border-bottom: none; }
+    .schedule-dot-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: 3px;
+    }
+    .schedule-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .schedule-dot.done { background: var(--green-400); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
+    .schedule-dot.pending { background: var(--purple-500); box-shadow: 0 0 6px rgba(139,92,246,0.5); }
+    .schedule-dot.upcoming { background: var(--text-muted); }
+    .schedule-dot.next {
+      background: var(--cyan-400);
+      box-shadow: 0 0 8px rgba(34,211,238,0.6);
+    }
+    .schedule-line {
+      width: 1px; flex: 1; min-height: 20px;
+      background: var(--border);
+      margin-top: 4px;
+    }
+
+    .schedule-info { flex: 1; min-width: 0; }
+    .schedule-date {
+      font-size: 11px; color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .schedule-title-text {
+      font-size: 13px; font-weight: 500;
+      color: var(--text-primary);
+    }
+    .schedule-amount {
+      font-size: 13px; font-weight: 700;
+      color: var(--text-primary);
+      text-align: right;
+    }
+    .schedule-status {
+      display: inline-block;
+      font-size: 10px; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+      margin-top: 3px;
+    }
+    .schedule-status.done {
+      background: rgba(52,211,153,0.12);
+      color: var(--green-400);
+    }
+    .schedule-status.pending {
+      background: rgba(139,92,246,0.15);
+      color: var(--purple-400);
+    }
+    .schedule-status.upcoming {
+      background: rgba(148,163,184,0.1);
+      color: var(--text-muted);
+    }
+    .schedule-status.next {
+      background: rgba(34,211,238,0.12);
+      color: var(--cyan-400);
+    }
+
+    /* ─── ACCOUNT INFO ─── */
+    .account-box {
+      background: var(--bg-hover);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .account-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 6px 0;
+    }
+    .account-key {
+      font-size: 12px; color: var(--text-muted);
+    }
+    .account-val {
+      font-size: 12px; font-weight: 500; color: var(--text-primary);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .verified-badge {
+      font-size: 10px; padding: 1px 6px;
+      background: rgba(52,211,153,0.12);
+      border: 1px solid rgba(52,211,153,0.25);
+      border-radius: 10px;
+      color: var(--green-400);
+    }
+    .copy-btn {
+      font-size: 11px; color: var(--text-muted);
+      cursor: pointer; padding: 2px 6px;
+      border-radius: 4px;
+      background: transparent; border: none;
+      transition: all 0.12s;
+    }
+    .copy-btn:hover { color: var(--purple-400); background: rgba(139,92,246,0.1); }
+
+    /* ─── POLICY SUMMARY ─── */
+    .policy-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .policy-row:last-child { border-bottom: none; }
+    .policy-key { font-size: 12px; color: var(--text-secondary); }
+    .policy-val { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+    .policy-val.highlight { color: var(--purple-400); }
+
+    /* ─── TABLE ─── */
+    .table-section { margin-top: 4px; }
+    .table-toolbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-input-wrap {
+      display: flex; align-items: center;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      gap: 6px;
+      flex: 1; max-width: 280px;
+    }
+    .search-icon { font-size: 13px; color: var(--text-muted); }
+    .search-input {
+      background: transparent; border: none; outline: none;
+      font-size: 12px; color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      width: 100%;
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .select-filter {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 10px;
+      font-size: 12px; color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      cursor: pointer;
+    }
+    .select-filter:focus { border-color: var(--border-strong); color: var(--text-primary); }
+
+    .table-count {
+      margin-left: auto;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .table-count span {
+      font-weight: 600; color: var(--purple-400);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead tr {
+      background: rgba(15,15,28,0.5);
+    }
+    th {
+      padding: 11px 16px;
+      font-size: 11px; font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.6px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    th.right, td.right { text-align: right; }
+    th.center, td.center { text-align: center; }
+    tbody tr {
+      border-bottom: 1px solid rgba(139,92,246,0.06);
+      transition: background 0.12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(139,92,246,0.04); }
+    td {
+      padding: 13px 16px;
+      font-size: 13px; color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    td.mono {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    td.amount {
+      font-weight: 600; color: var(--text-primary);
+    }
+    td.amount.positive { color: var(--green-400); }
+    td.amount.deduction { color: var(--red-400); }
+
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 500;
+    }
+    .status-badge::before {
+      content: ''; width: 5px; height: 5px;
+      border-radius: 50%;
+    }
+    .status-badge.done {
+      background: rgba(52,211,153,0.1);
+      border: 1px solid rgba(52,211,153,0.2);
+      color: var(--green-400);
+    }
+    .status-badge.done::before { background: var(--green-400); }
+    .status-badge.pending {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.25);
+      color: var(--purple-400);
+    }
+    .status-badge.pending::before { background: var(--purple-500); box-shadow: 0 0 4px rgba(139,92,246,0.8); }
+    .status-badge.processing {
+      background: rgba(251,146,60,0.1);
+      border: 1px solid rgba(251,146,60,0.2);
+      color: var(--orange-400);
+    }
+    .status-badge.processing::before { background: var(--orange-400); }
+    .status-badge.cancelled {
+      background: rgba(148,163,184,0.08);
+      border: 1px solid rgba(148,163,184,0.15);
+      color: var(--text-muted);
+    }
+    .status-badge.cancelled::before { background: var(--text-muted); }
+
+    /* ─── PAGINATION ─── */
+    .pagination {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .page-info { font-size: 12px; color: var(--text-muted); }
+    .page-btns { display: flex; gap: 4px; }
+    .page-btn {
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border);
+      transition: all 0.12s;
+    }
+    .page-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
+    .page-btn.active {
+      background: rgba(139,92,246,0.2);
+      border-color: var(--border-strong);
+      color: var(--purple-400);
+    }
+
+    /* ─── NOTICE BANNER ─── */
+    .notice-banner {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(34,211,238,0.06);
+      border: 1px solid rgba(34,211,238,0.2);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+    .notice-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .notice-text { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+    .notice-text strong { color: var(--cyan-400); font-weight: 600; }
+
+    /* ─── TABS SECTION ─── */
+    .section-tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0;
+    }
+    .section-tab {
+      padding: 12px 18px;
+      font-size: 13px; font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.15s;
+    }
+    .section-tab:hover { color: var(--text-secondary); }
+    .section-tab.active {
+      color: var(--purple-400);
+      border-bottom-color: var(--purple-500);
+    }
+
+    /* ─── BREAKDOWN ─── */
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .breakdown-item {
+      background: var(--bg-hover);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .breakdown-label {
+      font-size: 12px; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .breakdown-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+    }
+    .breakdown-value {
+      font-size: 14px; font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* ─── INFO TOOLTIP ─── */
+    .info-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: rgba(148,163,184,0.15);
+      color: var(--text-muted);
+      font-size: 9px; font-weight: 700;
+      cursor: help;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ╔══════════════════════════════╗
+       ║         SIDEBAR              ║
+       ╚══════════════════════════════╝ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">V8</div>
+      <span class="logo-text">Verse8</span>
+      <span class="logo-badge">CONSOLE</span>
+    </div>
+
+    <div class="workspace-info">
+      <div class="workspace-label">워크스페이스</div>
+      <div class="workspace-name">
+        <span class="workspace-dot"></span>
+        Planet Studio
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">개요</div>
+      <a class="nav-item" data-page="dashboard" onclick="navigate('dashboard')">
+        <span class="nav-icon">📊</span>한눈에 보기
+      </a>
+      <a class="nav-item" data-page="games" onclick="navigate('games')">
+        <span class="nav-icon">🎮</span>게임 관리
+      </a>
+
+      <div class="nav-group-label" style="margin-top:8px;">수익화</div>
+      <a class="nav-item" data-page="payments" onclick="navigate('payments')">
+        <span class="nav-icon">💰</span>결제 내역
+        <span class="nav-badge" id="badge-payments">3</span>
+      </a>
+      <a class="nav-item" data-page="ads" onclick="navigate('ads')">
+        <span class="nav-icon">📢</span>광고 수익
+      </a>
+      <a class="nav-item active" data-page="settlement" onclick="navigate('settlement')">
+        <span class="nav-icon">🏦</span>정산 관리
+      </a>
+      <a class="nav-item" data-page="tax" onclick="navigate('tax')">
+        <span class="nav-icon">🧾</span>세금계산서
+      </a>
+
+      <div class="nav-group-label" style="margin-top:8px;">분석</div>
+      <a class="nav-item" data-page="analytics" onclick="navigate('analytics')">
+        <span class="nav-icon">📈</span>매출 분석
+      </a>
+      <a class="nav-item" data-page="users" onclick="navigate('users')">
+        <span class="nav-icon">👥</span>유저 분석
+      </a>
+      <a class="nav-item" data-page="abtest" onclick="navigate('abtest')">
+        <span class="nav-icon">🔬</span>A/B 테스트
+      </a>
+
+      <div class="nav-group-label" style="margin-top:8px;">설정</div>
+      <a class="nav-item" data-page="account-settings" onclick="navigate('account-settings')">
+        <span class="nav-icon">⚙️</span>계좌 설정
+      </a>
+      <a class="nav-item" data-page="profile" onclick="navigate('profile')">
+        <span class="nav-icon">👤</span>프로필 설정
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar">P</div>
+        <div class="user-info">
+          <div class="user-name">Planet Studio</div>
+          <div class="user-role">관리자 · hakyong@planetariumhq.com</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ╔══════════════════════════════╗
+       ║           MAIN               ║
+       ╚══════════════════════════════╝ -->
+  <main class="main">
+
+    <!-- TOPBAR (dynamic) -->
+    <header class="topbar" id="main-topbar">
+      <span class="topbar-title" id="topbar-title">정산 관리</span>
+      <div class="topbar-divider"></div>
+      <span class="topbar-sub" id="topbar-sub">2026년 5월 기준</span>
+      <div class="topbar-spacer"></div>
+      <div id="topbar-actions">
+        <div class="tab-list">
+          <div class="tab-item active" onclick="setTab(this, 'overview')">정산 현황</div>
+          <div class="tab-item" onclick="setTab(this, 'history')">정산 내역</div>
+          <div class="tab-item" onclick="setTab(this, 'policy')">정산 정책</div>
+        </div>
+        <button class="btn btn-ghost" onclick="exportData()">⬇ 내보내기</button>
+        <button class="btn btn-primary" onclick="requestSettle()">정산 신청</button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTAINER -->
+    <div class="content" id="main-content">
+
+    <!-- ══════════ PAGE: 정산 관리 ══════════ -->
+    <div id="page-settlement">
+
+      <!-- NOTICE -->
+      <div class="notice-banner">
+        <span class="notice-icon">💡</span>
+        <div class="notice-text">
+          <strong>정산 일정 안내:</strong> 4월 기여 내역은 <strong>5월 5일</strong>까지 제공되며, 마케팅 기여금은 <strong>5월 말 영업일</strong>에 등록 계좌로 지급됩니다.
+          표시된 기여금은 게임 내 <strong>VX 소모량 · 플레이 지표 · 재방문율</strong> 등을 종합한 예상치이며, 최종 금액은 내역 확정일에 결정됩니다. 첫 출금은 <strong>$100 이상</strong>부터 가능합니다.
+        </div>
+      </div>
+
+      <!-- ══════════ TAB: 정산 현황 ══════════ -->
+      <div id="tab-overview">
+
+        <!-- DATE FILTER -->
+        <div class="date-filter">
+          <span class="date-filter-label">기간</span>
+          <div class="date-pills">
+            <div class="date-pill" onclick="setPeriod(this)">오늘</div>
+            <div class="date-pill" onclick="setPeriod(this)">7일</div>
+            <div class="date-pill active" onclick="setPeriod(this)">이번 달</div>
+            <div class="date-pill" onclick="setPeriod(this)">지난 달</div>
+            <div class="date-pill" onclick="setPeriod(this)">3개월</div>
+            <div class="date-pill" onclick="setPeriod(this)">올해</div>
+          </div>
+          <div class="date-custom">
+            <input type="date" class="date-input" value="2026-05-01" />
+            <span class="date-sep">~</span>
+            <input type="date" class="date-input" value="2026-05-31" />
+          </div>
+        </div>
+
+        <!-- STAT CARDS -->
+        <div class="stats-grid">
+          <div class="stat-card highlight">
+            <div class="stat-header">
+              <span class="stat-label">이번 달 예상 마케팅 기여금</span>
+              <div class="stat-icon purple">🏦</div>
+            </div>
+            <div class="stat-value gradient">~$2,951</div>
+            <div class="stat-meta">
+              <span class="stat-change up">↑ 12.4%</span>
+              <span>지난 달 대비</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">이번 달 VX 유통량</span>
+              <div class="stat-icon cyan">🪙</div>
+            </div>
+            <div class="stat-value">3,486,200 <span style="font-size:13px;font-weight:500;color:var(--text-muted)">VX</span></div>
+            <div class="stat-meta">
+              <span class="stat-change up">↑ 18.3%</span>
+              <span>지난 달 대비</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">기여금 지급 완료 (연누적)</span>
+              <div class="stat-icon green">✅</div>
+            </div>
+            <div class="stat-value">~$6,728</div>
+            <div class="stat-meta">
+              <span>2026년 1월 ~ 현재</span>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">출금 가능 잔액</span>
+              <div class="stat-icon orange">⏳</div>
+            </div>
+            <div class="stat-value">$742.10</div>
+            <div class="stat-meta">
+              <span style="font-size:11px;color:var(--text-muted)">첫 출금 최소 $100 이상</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHART + SCHEDULE -->
+        <div class="two-col">
+
+          <!-- 월별 정산 차트 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                월별 매출 · 정산 현황
+              </div>
+              <div style="display:flex;gap:12px;align-items:center;">
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)">
+                  <span style="width:8px;height:8px;background:var(--purple-500);border-radius:2px;display:inline-block"></span>VX 유통량
+                </span>
+                <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--text-muted)">
+                  <span style="width:8px;height:8px;background:var(--cyan-400);border-radius:2px;display:inline-block"></span>기여금
+                </span>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="settlementChart"></canvas>
+              </div>
+              <div class="breakdown-grid" style="margin-top:16px;">
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot" style="background:var(--purple-500)"></span>
+                    VX 유통량
+                  </div>
+                  <div class="breakdown-value">3,486,200 VX</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot" style="background:var(--cyan-400)"></span>
+                    기여 지수
+                    <span class="info-icon" title="VX 소모량, 플레이 수, 재방문율 등을 종합한 지수입니다">?</span>
+                  </div>
+                  <div class="breakdown-value" style="color:var(--cyan-400)">84.7 pts</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot" style="background:var(--green-400)"></span>
+                    예상 마케팅 기여금
+                  </div>
+                  <div class="breakdown-value" style="color:var(--green-400)">~$2,951</div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-label">
+                    <span class="breakdown-dot" style="background:var(--yellow-400)"></span>
+                    VX 충전 유저 수
+                  </div>
+                  <div class="breakdown-value">1,247명</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 정산 일정 + 계좌 -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+
+            <!-- 정산 일정 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span class="card-title-dot"></span>
+                  정산 일정
+                </div>
+                <span style="font-size:11px;color:var(--text-muted)">월정산</span>
+              </div>
+              <div class="card-body" style="padding-top:8px;padding-bottom:8px;">
+                <div class="schedule-list">
+                  <!-- 3월 정산: 내역 4/5, 지급 4/말 -->
+                  <div class="schedule-item">
+                    <div class="schedule-dot-wrap">
+                      <div class="schedule-dot done"></div>
+                      <div class="schedule-line"></div>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-date">내역 2026. 04. 05 · 지급 2026. 04. 30</div>
+                      <div class="schedule-title-text">3월 매출 정산</div>
+                      <span class="schedule-status done">지급 완료</span>
+                    </div>
+                    <div style="text-align:right;">
+                      <div class="schedule-amount">$2,621</div>
+                      <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">기여 지수 기준</div>
+                    </div>
+                  </div>
+                  <!-- 4월 정산: 내역 5/5, 지급 5/말 -->
+                  <div class="schedule-item">
+                    <div class="schedule-dot-wrap">
+                      <div class="schedule-dot done"></div>
+                      <div class="schedule-line"></div>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-date">내역 2026. 05. 05 완료 · 지급 2026. 05. 29 예정</div>
+                      <div class="schedule-title-text">4월 매출 정산</div>
+                      <span class="schedule-status next">지급 예정</span>
+                    </div>
+                    <div style="text-align:right;">
+                      <div class="schedule-amount" style="color:var(--cyan-400)">$2,951</div>
+                      <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">기여 지수 기준</div>
+                    </div>
+                  </div>
+                  <!-- 5월 정산: 내역 6/5, 지급 6/말 -->
+                  <div class="schedule-item">
+                    <div class="schedule-dot-wrap">
+                      <div class="schedule-dot pending"></div>
+                      <div class="schedule-line"></div>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-date">내역 2026. 06. 05 예정 · 지급 2026. 06. 30 예정</div>
+                      <div class="schedule-title-text">5월 매출 정산</div>
+                      <span class="schedule-status pending">집계 중</span>
+                    </div>
+                    <div style="text-align:right;">
+                      <div class="schedule-amount" style="color:var(--text-muted)">집계 중</div>
+                    </div>
+                  </div>
+                  <!-- 6월 정산: 미도래 -->
+                  <div class="schedule-item">
+                    <div class="schedule-dot-wrap">
+                      <div class="schedule-dot upcoming"></div>
+                    </div>
+                    <div class="schedule-info">
+                      <div class="schedule-date">내역 2026. 07. 05 예정 · 지급 2026. 07. 31 예정</div>
+                      <div class="schedule-title-text">6월 매출 정산</div>
+                      <span class="schedule-status upcoming">미도래</span>
+                    </div>
+                    <div>
+                      <div class="schedule-amount" style="color:var(--text-muted)">—</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 정산 계좌 -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span class="card-title-dot"></span>
+                  정산 계좌
+                </div>
+                <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="openAccountEdit()">수정</button>
+              </div>
+              <div class="card-body" style="padding-top:12px;">
+                <div class="account-box">
+                  <div class="account-row">
+                    <span class="account-key">은행</span>
+                    <span class="account-val">카카오뱅크 <span class="verified-badge">✓ 인증됨</span></span>
+                  </div>
+                  <div class="account-row">
+                    <span class="account-key">예금주</span>
+                    <span class="account-val">주식회사 플래닛</span>
+                  </div>
+                  <div class="account-row">
+                    <span class="account-key">계좌번호</span>
+                    <span class="account-val">
+                      3333-••••-••••
+                      <button class="copy-btn" onclick="copyAccount()">복사</button>
+                    </span>
+                  </div>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.6;">
+                  계좌 변경은 월 1회 가능합니다. 변경 후 다음 정산 주기부터 적용됩니다.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══════════ TAB: 정산 내역 ══════════ -->
+      <div id="tab-history" style="display:none;">
+        <div class="date-filter">
+          <span class="date-filter-label">기간</span>
+          <div class="date-pills">
+            <div class="date-pill" onclick="setPeriod(this)">7일</div>
+            <div class="date-pill" onclick="setPeriod(this)">이번 달</div>
+            <div class="date-pill active" onclick="setPeriod(this)">3개월</div>
+            <div class="date-pill" onclick="setPeriod(this)">6개월</div>
+            <div class="date-pill" onclick="setPeriod(this)">1년</div>
+          </div>
+          <div class="date-custom">
+            <input type="date" class="date-input" value="2026-02-01" />
+            <span class="date-sep">~</span>
+            <input type="date" class="date-input" value="2026-05-04" />
+          </div>
+        </div>
+
+        <div class="card table-section">
+          <div class="section-tabs">
+            <div class="section-tab active" onclick="setSubTab(this, 'all')">전체</div>
+            <div class="section-tab" onclick="setSubTab(this, 'done')">지급 완료</div>
+            <div class="section-tab" onclick="setSubTab(this, 'pending')">지급 예정</div>
+            <div class="section-tab" onclick="setSubTab(this, 'processing')">처리 중</div>
+          </div>
+          <div class="table-toolbar">
+            <div class="search-input-wrap">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="searchInput" class="search-input" placeholder="정산 ID, 게임명으로 검색..." />
+            </div>
+            <select id="gameFilter" class="select-filter">
+              <option>전체 게임</option>
+              <option>Cryzen.io</option>
+              <option>Water Color Sort</option>
+              <option>Lands of Blight</option>
+              <option>Murder Mystery</option>
+              <option>Count Control</option>
+            </select>
+            <select id="statusFilter" class="select-filter">
+              <option>전체 상태</option>
+              <option>지급 완료</option>
+              <option>지급 예정</option>
+              <option>처리 중</option>
+            </select>
+            <span class="table-count">총 <span>24</span>건</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>정산 ID</th>
+                <th>게임명</th>
+                <th>정산 기준일</th>
+                <th>내역 제공일</th>
+                <th>지급 예정일</th>
+                <th class="right">VX 소모량 <span class="info-icon" title="해당 월 게임 내에서 유저들이 소모한 총 VX 수량입니다">?</span></th>
+                <th class="right">예상 기여금 <span class="info-icon" title="VX 소모량·플레이 지표·재방문율을 종합한 예상 마케팅 기여금입니다">?</span></th>
+                <th class="center">상태</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="settlementTbody"></tbody>
+          </table>
+          <div class="pagination">
+            <div class="page-info">1 - 8 / 24건</div>
+            <div class="page-btns">
+              <button class="page-btn">‹</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">›</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════ TAB: 정산 정책 ══════════ -->
+      <div id="tab-policy" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+          <!-- 정산 기본 정책 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                정산 기본 정책
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="policy-row">
+                <span class="policy-key">정산 주기</span>
+                <span class="policy-val highlight">월정산</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 기준일</span>
+                <span class="policy-val">매월 말일 (말일 00:00 UTC 기준)</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 내역 제공</span>
+                <span class="policy-val highlight">익월 5일 이내</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산금 지급</span>
+                <span class="policy-val highlight">익월 말 영업일</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 지연</span>
+                <span class="policy-val">공휴일 · 주말 시 다음 영업일 지급</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 통화</span>
+                <span class="policy-val">USD (미국 달러)</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">첫 출금 최소 금액</span>
+                <span class="policy-val" style="color:var(--cyan-400)">$100 이상</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">미달 시 처리</span>
+                <span class="policy-val">익월 자동 이월 (누적 후 출금 가능)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- VX 기여금 모델 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                VX 기반 마케팅 기여금 모델
+              </div>
+              <span style="font-size:11px;color:var(--cyan-400);display:flex;align-items:center;gap:4px;font-weight:600;">
+                🪙 VX 시스템
+              </span>
+            </div>
+            <div class="card-body">
+              <!-- VX 흐름 설명 박스 -->
+              <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(34,211,238,0.05));border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:16px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                  <span style="font-size:16px;">🪙</span>
+                  <span style="font-size:13px;font-weight:600;color:var(--text-primary);">VX — Verse8 전용 가상화폐</span>
+                </div>
+                <div style="display:flex;gap:0;align-items:center;margin-bottom:12px;font-size:12px;">
+                  <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
+                    <div style="color:var(--purple-400);font-weight:600;margin-bottom:2px;">유저</div>
+                    <div style="color:var(--text-muted);">현금으로 VX 충전</div>
+                  </div>
+                  <div style="color:var(--text-muted);padding:0 8px;font-size:18px;">→</div>
+                  <div style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
+                    <div style="color:var(--cyan-400);font-weight:600;margin-bottom:2px;">플랫폼</div>
+                    <div style="color:var(--text-muted);">VX로 콘텐츠 구매</div>
+                  </div>
+                  <div style="color:var(--text-muted);padding:0 8px;font-size:18px;">→</div>
+                  <div style="background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.25);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
+                    <div style="color:var(--green-400);font-weight:600;margin-bottom:2px;">크리에이터</div>
+                    <div style="color:var(--text-muted);">기여금 현금 수령</div>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:var(--text-secondary);line-height:1.7;">
+                  유저는 VX를 플랫폼에서 충전한 뒤 게임 내 유료 콘텐츠를 VX로 구매합니다. 환불 발생 시에도 <strong style="color:var(--cyan-400);">현금이 아닌 VX로 환불</strong>되어 차지백(chargeback) 리스크가 없습니다. 크리에이터에게는 <strong style="color:var(--purple-400);">VX 소모량 + 플레이 지표 + 재방문율</strong>을 종합한 기여 지수를 기반으로 마케팅 기여금을 지급합니다.
+                </div>
+              </div>
+
+              <div class="policy-row">
+                <span class="policy-key">기여금 산정 기준</span>
+                <span class="policy-val">VX 소모량 · 플레이 수 · 재방문율 종합 지수</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">수수료율 공개 여부</span>
+                <span class="policy-val" style="color:var(--text-muted)">비공개 (국가별 정산 규제 상이)</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">크리에이터 기여금 수준</span>
+                <span class="policy-val" style="color:var(--green-400);">업계 최고 수준 보장</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">환불 정책</span>
+                <span class="policy-val" style="color:var(--cyan-400);font-weight:500;">VX 환불 (현금 환불 없음) — 기여금 공제 없음</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">파트너 별도 협의</span>
+                <span class="policy-val highlight">월 기여금 $10,000 이상 파트너 대상</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 정산 조건 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                정산 수령 조건
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--green-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">완료</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);">사업자 정보 등록</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">사업자등록증 제출 및 인증 완료</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--green-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">완료</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);">정산 계좌 인증</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">예금주명 일치 확인 완료</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:rgba(52,211,153,0.15);border:1px solid rgba(52,211,153,0.3);color:var(--green-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">완료</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);">서비스 이용 약관 동의</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">Verse8 개발자 약관 및 정산 정책 동의</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start;">
+                  <span style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);color:var(--purple-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">조건부</span>
+                  <div>
+                    <div style="font-size:13px;font-weight:500;color:var(--text-primary);">첫 출금 최소 금액 충족</div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">첫 출금은 $100 이상이어야 하며, 미달 시 익월 자동 이월</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- FAQ -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                자주 묻는 질문
+              </div>
+            </div>
+            <div class="card-body">
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. VX란 무엇인가요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">VX는 Verse8 플랫폼 전용 가상화폐입니다. 유저가 현금으로 VX를 충전하고, 충전된 VX로 게임 내 유료 콘텐츠를 구매합니다. 크리에이터는 게임 내 VX 소모량과 플레이 지표를 기반으로 마케팅 기여금을 수령합니다.</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. 환불이 발생하면 기여금이 줄어드나요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">아닙니다. Verse8의 환불은 현금이 아닌 <strong style="color:var(--cyan-400);">VX로 환불</strong>됩니다. 환불된 VX는 유저의 계정에 재적립되며, 이미 소모된 VX는 기여 지수에서 차감되지 않습니다. 크리에이터의 기여금에는 영향이 없습니다.</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. 기여금 산정 방식을 구체적으로 알 수 있나요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">기여금은 VX 소모량, 플레이 수, 평균 체류 시간, 재방문율 등 여러 지표를 종합한 기여 지수(Contribution Score)를 기반으로 산정됩니다. YouTube가 조회수·광고 단가·시청 지속시간을 조합해 수익을 산정하는 것과 동일한 방식입니다. 국가별 정산 규제 차이로 단일 비율은 공개되지 않습니다.</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. 첫 출금 $100 기준은 이후에도 동일한가요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">첫 출금만 $100 이상 조건이 적용됩니다. 이후 출금 최소 금액은 별도 정책에 따르며, 미달 금액은 익월로 자동 이월됩니다.</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. 기여 내역은 언제 확인할 수 있나요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">전월 기여 내역은 익월 5일 이내에 대시보드에서 확인 가능합니다. 실제 기여금 지급은 익월 말 영업일에 이루어집니다.</div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--purple-400);margin-bottom:4px;">Q. 지급일이 공휴일이면 언제 받나요?</div>
+                  <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">익월 말 영업일 기준으로 지급되므로, 말일이 공휴일 또는 주말이면 그 직전 영업일에 지급됩니다.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div> <!-- /page-settlement -->
+
+    <!-- ══════════ DYNAMIC PAGES (rendered by JS) ══════════ -->
+    <div id="page-dashboard" style="display:none;"></div>
+    <div id="page-games" style="display:none;"></div>
+
+    <!-- ══════════ PAGE: 결제 내역 (VX 사용 내역) ══════════ -->
+    <div id="page-payments" style="display:none;">
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px;">
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">이번 달 구매 건수</span><div class="stat-icon purple">🎮</div></div><div class="stat-value">3,842</div><div class="stat-meta"><span class="stat-change up">↑ 24%</span><span>지난 달</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">이번 달 VX 소모량</span><div class="stat-icon cyan">🪙</div></div><div class="stat-value">2,891,400 <span style="font-size:12px;color:var(--text-muted)">VX</span></div><div class="stat-meta"><span class="stat-change up">↑ 21%</span><span>지난 달</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">평균 구매당 VX</span><div class="stat-icon green">📊</div></div><div class="stat-value">752 <span style="font-size:12px;color:var(--text-muted)">VX</span></div><div class="stat-meta"><span class="stat-change up">↑ 42 VX</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">구매 활성 유저</span><div class="stat-icon orange">👥</div></div><div class="stat-value">2,840</div><div class="stat-meta"><span class="stat-change up">↑ 8%</span><span>지난 달</span></div></div>
+      </div>
+      <div class="card table-section">
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--border);">
+          <div class="section-tab active" onclick="setUseTab(this,'all')">전체</div>
+          <div class="section-tab" onclick="setUseTab(this,'Cryzen.io')">Cryzen.io</div>
+          <div class="section-tab" onclick="setUseTab(this,'Water Color Sort')">Water Color Sort</div>
+          <div class="section-tab" onclick="setUseTab(this,'Lands of Blight')">Lands of Blight</div>
+        </div>
+        <div class="table-toolbar">
+          <div class="search-input-wrap"><span class="search-icon">🔍</span><input type="text" class="search-input" placeholder="유저 ID, 아이템명 검색..." oninput="filterUse(this.value)" /></div>
+          <select class="select-filter" onchange="filterUse()">
+            <option>전체 게임</option><option>Cryzen.io</option><option>Water Color Sort</option><option>Lands of Blight</option><option>Murder Mystery</option>
+          </select>
+          <span class="table-count">총 <span id="use-count">12</span>건</span>
+          <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px;" onclick="exportUseCSV()">⬇ 내보내기</button>
+        </div>
+        <table><thead><tr>
+          <th>트랜잭션 ID</th><th>유저 ID</th><th>게임명</th><th>아이템</th><th>구매일시</th><th class="right">사용 VX</th><th class="center">상태</th>
+        </tr></thead><tbody id="useTbody"></tbody></table>
+        <div class="pagination"><div class="page-info" id="use-page-info">1 - 7 / 12건</div><div class="page-btns" id="use-page-btns"></div></div>
+      </div>
+    </div>
+
+    <div id="page-ads" style="display:none;"></div>
+    <div id="page-tax" style="display:none;"></div>
+
+    <!-- ══════════ PAGE: 매출 분석 (canvas) ══════════ -->
+    <div id="page-analytics" style="display:none;">
+      <div style="margin-bottom:20px;"><div style="font-size:18px;font-weight:700;color:#f1f0ff;">매출 분석</div><div style="font-size:12px;color:#4b5563;margin-top:3px;">상세 매출 및 수익 분석</div></div>
+      <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
+        <div class="stat-card highlight"><div class="stat-header"><span class="stat-label">월 매출 성장률</span><div class="stat-icon purple">📈</div></div><div class="stat-value gradient">+23%</div><div class="stat-meta"><span>전년 동기 대비</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">결제 전환율</span><div class="stat-icon cyan">🎯</div></div><div class="stat-value">3.4%</div><div class="stat-meta"><span class="stat-change up">↑ 0.3%p</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">ARPU</span><div class="stat-icon green">👤</div></div><div class="stat-value">$0.38</div><div class="stat-meta"><span class="stat-change up">↑ $0.04</span></div></div>
+        <div class="stat-card"><div class="stat-header"><span class="stat-label">ARPPU</span><div class="stat-icon orange">💎</div></div><div class="stat-value">$3.86</div><div class="stat-meta"><span class="stat-change up">↑ $0.21</span></div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-title"><span class="card-title-dot"></span>월별 매출 추이 (최근 6개월)</div></div>
+        <div class="card-body"><div style="height:240px;"><canvas id="analyticsChart"></canvas></div></div>
+      </div>
+    </div>
+
+    <div id="page-users" style="display:none;"></div>
+    <div id="page-abtest" style="display:none;"></div>
+    <div id="page-account-settings" style="display:none;"></div>
+    <div id="page-profile" style="display:none;"></div>
+
+    </div> <!-- /page-container -->
+  </main>
+</div>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  MODAL: 정산 상세                         ║
+     ╚══════════════════════════════════════════╝ -->
+<div id="detailModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#f1f0ff;" id="detailTitle">정산 상세</div>
+        <div style="font-size:11px;color:#4b5563;margin-top:2px;" id="detailId">STL-2026042001</div>
+      </div>
+      <button onclick="closeModal('detailModal')" style="background:rgba(148,163,184,0.1);border:none;color:#94a3b8;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="padding:20px 24px;" id="detailBody"></div>
+    <div style="padding:12px 24px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid rgba(139,92,246,0.1);">
+      <button onclick="closeModal('detailModal')" class="btn btn-ghost">닫기</button>
+      <button onclick="downloadDetailCSV()" class="btn btn-primary">⬇ 이 건 다운로드</button>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  MODAL: 정산 신청 확인                    ║
+     ╚══════════════════════════════════════════╝ -->
+<div id="settleModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:28px 24px 0;text-align:center;">
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#7c3aed,#22d3ee);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:22px;">🏦</div>
+      <div style="font-size:17px;font-weight:700;color:#f1f0ff;margin-bottom:6px;">정산을 신청하시겠습니까?</div>
+      <div style="font-size:12px;color:#94a3b8;line-height:1.7;margin-bottom:20px;">
+        출금 가능 잔액 <strong style="color:#22d3ee">$742.10</strong>을 신청합니다.<br>
+        정산 내역은 <strong style="color:#a78bfa">익월 5일 이내</strong> 확인 가능하며,<br>
+        지급은 <strong style="color:#a78bfa">익월 말 영업일</strong>에 이루어집니다.
+      </div>
+    </div>
+    <div style="margin:0 24px 20px;background:#1c1c32;border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:14px 16px;">
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
+        <span style="color:#4b5563">정산 계좌</span>
+        <span style="color:#f1f0ff;font-weight:500;">카카오뱅크 3333-••••-••••</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
+        <span style="color:#4b5563">신청 금액</span>
+        <span style="color:#34d399;font-weight:700;">$742.10</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
+        <span style="color:#4b5563">지급 예정일</span>
+        <span style="color:#f1f0ff;">2026. 06. 30 (말 영업일)</span>
+      </div>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;gap:8px;">
+      <button onclick="closeModal('settleModal')" class="btn btn-ghost" style="flex:1;justify-content:center;">취소</button>
+      <button onclick="confirmSettle()" class="btn btn-primary" style="flex:1;justify-content:center;">신청 확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ╔══════════════════════════════════════════╗
+     ║  MODAL: 계좌 수정                         ║
+     ╚══════════════════════════════════════════╝ -->
+<div id="accountModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:440px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:15px;font-weight:700;color:#f1f0ff;">정산 계좌 수정</div>
+      <button onclick="closeModal('accountModal')" style="background:rgba(148,163,184,0.1);border:none;color:#94a3b8;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="font-size:11px;color:#fb923c;background:rgba(251,146,60,0.08);border:1px solid rgba(251,146,60,0.2);border-radius:8px;padding:10px 12px;margin-bottom:18px;line-height:1.6;">
+        ⚠ 계좌 변경은 월 1회만 가능합니다. 변경 후 다음 정산 주기부터 적용됩니다.
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:6px;">은행</label>
+        <select id="bankSelect" class="select-filter" style="width:100%;padding:9px 12px;">
+          <option>카카오뱅크</option><option>국민은행</option><option>신한은행</option>
+          <option>우리은행</option><option>하나은행</option><option>기업은행</option>
+          <option>농협은행</option><option>토스뱅크</option>
+        </select>
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:6px;">예금주</label>
+        <input id="accountName" type="text" value="주식회사 플래닛" class="date-input" style="width:100%;padding:9px 12px;" />
+      </div>
+      <div style="margin-bottom:6px;">
+        <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:6px;">계좌번호</label>
+        <input id="accountNum" type="text" placeholder="'-' 없이 입력" class="date-input" style="width:100%;padding:9px 12px;" />
+      </div>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;gap:8px;">
+      <button onclick="closeModal('accountModal')" class="btn btn-ghost" style="flex:1;justify-content:center;">취소</button>
+      <button onclick="saveAccount()" class="btn btn-primary" style="flex:1;justify-content:center;">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ═══════════════════════════════════════════
+     NAVIGATION
+  ═══════════════════════════════════════════ */
+  const PAGE_CONFIG = {
+    dashboard:        { title:'한눈에 보기',   sub:'실시간 현황',       actions:'' },
+    games:            { title:'게임 관리',      sub:'등록 게임 5개',     actions:'<button class="btn btn-primary" onclick="showToast(\'🎮 게임 등록 기능은 준비 중입니다.\')">+ 게임 등록</button>' },
+    payments:         { title:'결제 내역',      sub:'2026년 5월 기준',   actions:'<button class="btn btn-ghost" onclick="exportPayments()">⬇ 내보내기</button>' },
+    ads:              { title:'광고 수익',      sub:'2026년 5월 기준',   actions:'' },
+    settlement:       { title:'정산 관리',      sub:'2026년 5월 기준',   actions:`<div class="tab-list"><div class="tab-item active" onclick="setTab(this,'overview')">정산 현황</div><div class="tab-item" onclick="setTab(this,'history')">정산 내역</div><div class="tab-item" onclick="setTab(this,'policy')">정산 정책</div></div><button class="btn btn-ghost" onclick="exportData()">⬇ 내보내기</button><button class="btn btn-primary" onclick="requestSettle()">정산 신청</button>` },
+    tax:              { title:'세금계산서',     sub:'정산 완료 기준',    actions:'<button class="btn btn-primary" onclick="showToast(\'📄 세금계산서 발행 요청이 접수되었습니다.\')">+ 발행 요청</button>' },
+    analytics:        { title:'매출 분석',      sub:'최근 6개월',        actions:'' },
+    users:            { title:'유저 분석',      sub:'2026년 5월 기준',   actions:'' },
+    abtest:           { title:'A/B 테스트',     sub:'진행 중 2개',       actions:'<button class="btn btn-primary" onclick="showToast(\'🔬 새 실험 생성 기능은 준비 중입니다.\')">+ 새 실험</button>' },
+    'account-settings':{ title:'계좌 설정',    sub:'정산 계좌 관리',    actions:'' },
+    profile:          { title:'프로필 설정',    sub:'개발자 계정',       actions:'' },
+  };
+
+  function navigate(pageId) {
+    // 모든 페이지 숨기기
+    document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+
+    // 타겟 페이지 표시
+    const target = document.getElementById('page-' + pageId);
+    if (target) target.style.display = 'block';
+
+    // 사이드바 active 업데이트
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const navItem = document.querySelector(`.nav-item[data-page="${pageId}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    // 탑바 업데이트
+    const cfg = PAGE_CONFIG[pageId] || { title: pageId, sub: '', actions: '' };
+    document.getElementById('topbar-title').textContent = cfg.title;
+    document.getElementById('topbar-sub').textContent   = cfg.sub;
+    document.getElementById('topbar-actions').innerHTML = cfg.actions;
+
+    // 페이지별 초기화
+    if (pageId === 'settlement') {
+      // 탭 상태 복원
+      const firstTab = document.querySelector('#tab-overview');
+      if (firstTab) {
+        document.querySelectorAll('[id^="tab-"]').forEach(t => t.style.display = 'none');
+        firstTab.style.display = 'block';
+      }
+    }
+    if (pageId === 'analytics') setTimeout(initAnalyticsChart, 50);
+    if (pageId === 'payments') renderUse();
+    if (PAGE_RENDERERS[pageId]) PAGE_RENDERERS[pageId](target);
+
+    // 뱃지 숨기기
+    if (pageId === 'payments') {
+      const b = document.getElementById('badge-payments');
+      if (b) b.style.display = 'none';
+    }
+
+    window.scrollTo(0,0);
+  }
+
+  /* ═══════════════════════════════════════════
+     PAYMENTS PAGE
+  ═══════════════════════════════════════════ */
+  const PAYMENT_ROWS = [
+    { id:'VXC-20260430-001', user:'usr_a1b2c3', pkg:'100 VX Pack',    vx:100,   bonus:0,    date:'2026.04.30 14:22', status:'completed' },
+    { id:'VXC-20260430-002', user:'usr_d4e5f6', pkg:'550 VX Pack',    vx:500,   bonus:50,   date:'2026.04.30 11:08', status:'completed' },
+    { id:'VXC-20260429-001', user:'usr_g7h8i9', pkg:'1,200 VX Pack',  vx:1000,  bonus:200,  date:'2026.04.29 20:45', status:'completed' },
+    { id:'VXC-20260429-002', user:'usr_j1k2l3', pkg:'100 VX Pack',    vx:100,   bonus:0,    date:'2026.04.29 17:33', status:'refunded'  },
+    { id:'VXC-20260428-001', user:'usr_m4n5o6', pkg:'2,600 VX Pack',  vx:2000,  bonus:600,  date:'2026.04.28 09:14', status:'completed' },
+    { id:'VXC-20260428-002', user:'usr_p7q8r9', pkg:'550 VX Pack',    vx:500,   bonus:50,   date:'2026.04.28 08:02', status:'completed' },
+    { id:'VXC-20260427-001', user:'usr_s1t2u3', pkg:'1,200 VX Pack',  vx:1000,  bonus:200,  date:'2026.04.27 22:55', status:'completed' },
+    { id:'VXC-20260427-002', user:'usr_v4w5x6', pkg:'100 VX Pack',    vx:100,   bonus:0,    date:'2026.04.27 16:40', status:'refunded'  },
+    { id:'VXC-20260426-001', user:'usr_y7z8a1', pkg:'6,500 VX Pack',  vx:5000,  bonus:1500, date:'2026.04.26 13:21', status:'completed' },
+    { id:'VXC-20260426-002', user:'usr_b2c3d4', pkg:'100 VX Pack',    vx:100,   bonus:0,    date:'2026.04.26 10:05', status:'completed' },
+    { id:'VXC-20260425-001', user:'usr_e5f6g7', pkg:'550 VX Pack',    vx:500,   bonus:50,   date:'2026.04.25 19:30', status:'pending'   },
+    { id:'VXC-20260425-002', user:'usr_h8i9j1', pkg:'100 VX Pack',    vx:100,   bonus:0,    date:'2026.04.25 15:17', status:'completed' },
+  ];
+
+  let payPage = 1;
+  const PAY_PAGE_SIZE = 7;
+  let paySubTab = 'all';
+  let paySearch = '';
+
+  function getFilteredPayments() {
+    return PAYMENT_ROWS.filter(r => {
+      if (paySubTab !== 'all' && r.status !== paySubTab) return false;
+      if (paySearch && !r.id.toLowerCase().includes(paySearch) && !r.game.toLowerCase().includes(paySearch) && !r.item.toLowerCase().includes(paySearch)) return false;
+      return true;
+    });
+  }
+
+  function renderPayments() {
+    const rows  = getFilteredPayments();
+    const total = rows.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAY_PAGE_SIZE));
+    if (payPage > totalPages) payPage = 1;
+    const pageRows = rows.slice((payPage-1)*PAY_PAGE_SIZE, payPage*PAY_PAGE_SIZE);
+
+    const statusLabel = { completed:'충전 완료', refunded:'VX 환불', pending:'처리 중' };
+    const statusClass = { completed:'done', refunded:'cancelled', pending:'processing' };
+
+    const tbody = document.getElementById('paymentsTbody');
+    if (!tbody) return;
+    if (pageRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#4b5563;">결과 없음</td></tr>`;
+    } else {
+      tbody.innerHTML = pageRows.map(r => `<tr>
+        <td class="mono" style="font-size:11px;">${r.id}</td>
+        <td class="mono" style="font-size:11px;color:#4b5563;">${r.user}</td>
+        <td style="font-weight:500;color:#f1f0ff;">${r.pkg}</td>
+        <td class="right" style="font-weight:700;color:#22d3ee;">${(r.vx + r.bonus).toLocaleString()} VX${r.bonus>0?` <span style="font-size:10px;color:#34d399;">(+${r.bonus} 보너스)</span>`:''}</td>
+        <td style="font-size:12px;color:#4b5563;">${r.date}</td>
+        <td class="center"><span class="status-badge ${statusClass[r.status]}">${statusLabel[r.status]}</span></td>
+        <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🧾 ${r.id} 상세')">상세</button></td>
+      </tr>`).join('');
+    }
+
+    const countEl = document.getElementById('pay-count');
+    if (countEl) countEl.textContent = total;
+
+    const start = total===0 ? 0 : (payPage-1)*PAY_PAGE_SIZE+1;
+    const end   = Math.min(payPage*PAY_PAGE_SIZE, total);
+    const pi = document.getElementById('pay-page-info');
+    if (pi) pi.textContent = `${start} - ${end} / ${total}건`;
+
+    const pb = document.getElementById('pay-page-btns');
+    if (pb) {
+      let html = `<button class="page-btn" onclick="goPayPage(${payPage-1})" ${payPage===1?'disabled style="opacity:0.3"':''}>‹</button>`;
+      for (let i=1;i<=totalPages;i++) html += `<button class="page-btn ${i===payPage?'active':''}" onclick="goPayPage(${i})">${i}</button>`;
+      html += `<button class="page-btn" onclick="goPayPage(${payPage+1})" ${payPage===totalPages?'disabled style="opacity:0.3"':''}>›</button>`;
+      pb.innerHTML = html;
+    }
+  }
+
+  function goPayPage(p) {
+    const max = Math.max(1, Math.ceil(getFilteredPayments().length / PAY_PAGE_SIZE));
+    payPage = Math.max(1, Math.min(p, max));
+    renderPayments();
+  }
+
+  /* VX 사용 내역 */
+  let useSubTab = 'all';
+  let useSearch = '';
+  let usePage = 1;
+
+  function getFilteredUse() {
+    return VX_USE_ROWS.filter(r => {
+      if (useSubTab !== 'all' && r.game !== useSubTab) return false;
+      if (useSearch && !r.id.toLowerCase().includes(useSearch) && !r.item.toLowerCase().includes(useSearch) && !r.user.toLowerCase().includes(useSearch)) return false;
+      return true;
+    });
+  }
+
+  function renderUse() {
+    const rows = getFilteredUse();
+    const total = rows.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAY_PAGE_SIZE));
+    if (usePage > totalPages) usePage = 1;
+    const pageRows = rows.slice((usePage-1)*PAY_PAGE_SIZE, usePage*PAY_PAGE_SIZE);
+    const statusLabel = { completed:'사용 완료', refunded:'VX 환불' };
+    const statusClass = { completed:'done', refunded:'cancelled' };
+    const tbody = document.getElementById('useTbody');
+    if (!tbody) return;
+    tbody.innerHTML = pageRows.length === 0
+      ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:#4b5563;">결과 없음</td></tr>`
+      : pageRows.map(r => `<tr>
+          <td class="mono" style="font-size:11px;">${r.id}</td>
+          <td class="mono" style="font-size:11px;color:#4b5563;">${r.user}</td>
+          <td style="font-weight:500;color:#f1f0ff;">${r.game}</td>
+          <td style="color:#94a3b8;">${r.item}</td>
+          <td style="font-size:12px;color:#4b5563;">${r.date}</td>
+          <td class="right" style="font-weight:700;color:#a78bfa;">${r.vx.toLocaleString()} VX</td>
+          <td class="center"><span class="status-badge ${statusClass[r.status]}">${statusLabel[r.status]}</span></td>
+        </tr>`).join('');
+    const uc = document.getElementById('use-count');
+    if (uc) uc.textContent = total;
+    const start = total===0?0:(usePage-1)*PAY_PAGE_SIZE+1;
+    const end = Math.min(usePage*PAY_PAGE_SIZE, total);
+    const upi = document.getElementById('use-page-info');
+    if (upi) upi.textContent = `${start} - ${end} / ${total}건`;
+    const upb = document.getElementById('use-page-btns');
+    if (upb) {
+      let html = `<button class="page-btn" onclick="goUsePage(${usePage-1})" ${usePage===1?'disabled style="opacity:0.3"':''}>‹</button>`;
+      for (let i=1;i<=totalPages;i++) html += `<button class="page-btn ${i===usePage?'active':''}" onclick="goUsePage(${i})">${i}</button>`;
+      html += `<button class="page-btn" onclick="goUsePage(${usePage+1})" ${usePage===totalPages?'disabled style="opacity:0.3"':''}>›</button>`;
+      upb.innerHTML = html;
+    }
+  }
+
+  function goUsePage(p) {
+    const max = Math.max(1, Math.ceil(getFilteredUse().length / PAY_PAGE_SIZE));
+    usePage = Math.max(1, Math.min(p, max));
+    renderUse();
+  }
+
+  function setUseTab(el, id) {
+    el.closest('.card').querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    useSubTab = id; usePage = 1; renderUse();
+  }
+
+  function filterUse(val) { useSearch = (val||'').toLowerCase(); usePage=1; renderUse(); }
+
+  function exportUseCSV() {
+    const rows = getFilteredUse();
+    const header = '트랜잭션ID,유저ID,게임명,아이템,구매일시,사용VX,상태';
+    const body = rows.map(r => `"${r.id}","${r.user}","${r.game}","${r.item}","${r.date}","${r.vx}","${r.status}"`).join('\n');
+    downloadFile('verse8_vx_usage_export.csv', header + '\n' + body);
+    showToast(`📥 <strong>${rows.length}건</strong> 다운로드 완료`);
+  }
+
+  function switchVxMain(tab) {
+    document.getElementById('vxSection-charge').style.display = tab==='charge' ? 'block' : 'none';
+    document.getElementById('vxSection-use').style.display    = tab==='use'    ? 'block' : 'none';
+    document.getElementById('vxMainTab-charge').className = tab==='charge' ? 'btn btn-primary' : 'btn btn-ghost';
+    document.getElementById('vxMainTab-use').className    = tab==='use'    ? 'btn btn-primary' : 'btn btn-ghost';
+    if (tab==='charge') renderPayments();
+    if (tab==='use')    renderUse();
+  }
+
+  function setPayTab(el, id) {
+    el.closest('div').querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    paySubTab = id; payPage = 1; renderPayments();
+  }
+
+  function filterPayments(val) { paySearch = (val||'').toLowerCase(); payPage=1; renderPayments(); }
+
+  function exportPayments() {
+    const rows = getFilteredPayments();
+    const header = '트랜잭션ID,유저ID,게임명,상품,결제일시,금액,상태';
+    const body = rows.map(r => `"${r.id}","${r.user}","${r.game}","${r.item}","${r.date}","${r.amount}","${r.status}"`).join('\n');
+    downloadFile('verse8_payments_export.csv', header+'\n'+body);
+    showToast(`📥 결제 내역 ${rows.length}건 다운로드 완료`);
+  }
+
+  /* ═══════════════════════════════════════════
+     ANALYTICS CHART
+  ═══════════════════════════════════════════ */
+  let analyticsChartInstance = null;
+  function initAnalyticsChart() {
+    const canvas = document.getElementById('analyticsChart');
+    if (!canvas) return;
+    if (analyticsChartInstance) { analyticsChartInstance.destroy(); }
+    analyticsChartInstance = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['12월','1월','2월','3월','4월','5월'],
+        datasets: [
+          { label:'총 수익', data:[3260,3590,4130,4910,5970,null], borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.1)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#8b5cf6', pointRadius:4 },
+          { label:'정산액', data:[2608,2872,3304,3928,4776,null], borderColor:'#22d3ee', backgroundColor:'rgba(34,211,238,0.06)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#22d3ee', pointRadius:4 },
+        ]
+      },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
+        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(13,13,20,0.95)', borderColor:'rgba(139,92,246,0.3)', borderWidth:1, titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12, callbacks:{ label: c => `  ${c.dataset.label}: $${c.parsed.y}` } } },
+        scales:{
+          x:{ grid:{display:false}, ticks:{color:'#4b5563',font:{size:11}}, border:{color:'rgba(139,92,246,0.1)'} },
+          y:{ grid:{color:'rgba(139,92,246,0.07)'}, ticks:{color:'#4b5563',font:{size:11},callback:v=>'$'+v}, border:{display:false} }
+        }
+      }
+    });
+  }
+
+  /* ═══════════════════════════════════════════
+     TOGGLE SWITCH
+  ═══════════════════════════════════════════ */
+  function toggleSwitch(el) {
+    const isOn = el.style.background.includes('8b5cf6') || el.style.background.includes('var(--purple');
+    el.style.background = isOn ? 'rgba(75,85,99,0.5)' : 'var(--purple-500)';
+    const dot = el.querySelector('div');
+    if (isOn) { dot.style.right='auto'; dot.style.left='3px'; }
+    else       { dot.style.left='auto'; dot.style.right='3px'; }
+    showToast(isOn ? '🔕 알림이 꺼졌습니다.' : '🔔 알림이 켜졌습니다.');
+  }
+
+  function copyApiKey() {
+    navigator.clipboard.writeText('v8_live_pk_placeholder_key').then(()=>showToast('📋 API 키가 복사되었습니다.'));
+  }
+
+  /* ═══════════════════════════════════════════
+     DATA
+  ═══════════════════════════════════════════ */
+  const ALL_ROWS = [
+    { id:'STL-2026042001', game:'Cryzen.io',       base:'2026. 04. 30', notify:'2026. 05. 05', pay:'2026. 05. 29', plays:142300, vx:1247800, revenue:1124, status:'done' },
+    { id:'STL-2026042002', game:'Water Color Sort', base:'2026. 04. 30', notify:'2026. 05. 05', pay:'2026. 05. 29', plays:93450,  vx:620300,  revenue:743,  status:'pending' },
+    { id:'STL-2026042003', game:'Lands of Blight',  base:'2026. 04. 30', notify:'2026. 05. 05', pay:'2026. 05. 29', plays:75820,  vx:910100,  revenue:602,  status:'pending' },
+    { id:'STL-2026042004', game:'Murder Mystery',   base:'2026. 04. 30', notify:'2026. 05. 05', pay:'2026. 05. 29', plays:60110,  vx:428400,  revenue:482,  status:'processing' },
+    { id:'STL-2026031801', game:'Cryzen.io',        base:'2026. 03. 31', notify:'2026. 04. 05', pay:'2026. 04. 30', plays:125600, vx:1098200, revenue:995,  status:'done' },
+    { id:'STL-2026031802', game:'Water Color Sort',  base:'2026. 03. 31', notify:'2026. 04. 05', pay:'2026. 04. 30', plays:85200,  vx:541600,  revenue:676,  status:'done' },
+    { id:'STL-2026031803', game:'Count Control',     base:'2026. 03. 31', notify:'2026. 04. 05', pay:'2026. 04. 30', plays:58900,  vx:374200,  revenue:468,  status:'done' },
+    { id:'STL-2026022001', game:'Cryzen.io',         base:'2026. 02. 28', notify:'2026. 03. 05', pay:'2026. 03. 31', plays:110400, vx:963800,  revenue:876,  status:'done' },
+    { id:'STL-2026022002', game:'Water Color Sort',  base:'2026. 02. 28', notify:'2026. 03. 05', pay:'2026. 03. 31', plays:72300,  vx:458900,  revenue:574,  status:'done' },
+    { id:'STL-2026022003', game:'Murder Mystery',    base:'2026. 02. 28', notify:'2026. 03. 05', pay:'2026. 03. 31', plays:48600,  vx:311400,  revenue:386,  status:'done' },
+    { id:'STL-2026012001', game:'Cryzen.io',         base:'2026. 01. 31', notify:'2026. 02. 05', pay:'2026. 02. 28', plays:98700,  vx:862400,  revenue:783,  status:'done' },
+    { id:'STL-2026012002', game:'Lands of Blight',   base:'2026. 01. 31', notify:'2026. 02. 05', pay:'2026. 02. 28', plays:64200,  vx:612700,  revenue:510,  status:'done' },
+    { id:'STL-2026012003', game:'Count Control',     base:'2026. 01. 31', notify:'2026. 02. 05', pay:'2026. 02. 28', plays:41800,  vx:267900,  revenue:332,  status:'done' },
+    { id:'STL-2025123101', game:'Cryzen.io',         base:'2025. 12. 31', notify:'2026. 01. 05', pay:'2026. 01. 31', plays:88400,  vx:774100,  revenue:701,  status:'done' },
+    { id:'STL-2025123102', game:'Water Color Sort',  base:'2025. 12. 31', notify:'2026. 01. 05', pay:'2026. 01. 31', plays:61500,  vx:389600,  revenue:488,  status:'done' },
+  ];
+
+  const VX_USE_ROWS = [
+    { id:'VXU-20260430-001', user:'usr_a1b2c3', game:'Cryzen.io',       item:'골드 팩 100',    date:'2026.04.30 14:22', vx:100,  status:'completed' },
+    { id:'VXU-20260430-002', user:'usr_d4e5f6', game:'Water Color Sort', item:'힌트 30개',       date:'2026.04.30 11:08', vx:150,  status:'completed' },
+    { id:'VXU-20260429-001', user:'usr_g7h8i9', game:'Cryzen.io',       item:'스타터 팩',       date:'2026.04.29 20:45', vx:500,  status:'completed' },
+    { id:'VXU-20260429-002', user:'usr_j1k2l3', game:'Lands of Blight',  item:'캐릭터 스킨',    date:'2026.04.29 17:33', vx:300,  status:'refunded'  },
+    { id:'VXU-20260428-001', user:'usr_m4n5o6', game:'Murder Mystery',   item:'프리미엄 통행증', date:'2026.04.28 09:14', vx:400,  status:'completed' },
+    { id:'VXU-20260428-002', user:'usr_p7q8r9', game:'Cryzen.io',       item:'골드 팩 500',    date:'2026.04.28 08:02', vx:400,  status:'completed' },
+    { id:'VXU-20260427-001', user:'usr_s1t2u3', game:'Water Color Sort', item:'광고 제거',       date:'2026.04.27 22:55', vx:200,  status:'completed' },
+    { id:'VXU-20260427-002', user:'usr_v4w5x6', game:'Lands of Blight',  item:'스킬 부스터',    date:'2026.04.27 16:40', vx:100,  status:'refunded'  },
+    { id:'VXU-20260426-001', user:'usr_y7z8a1', game:'Cryzen.io',       item:'시즌 패스',       date:'2026.04.26 13:21', vx:1000, status:'completed' },
+    { id:'VXU-20260426-002', user:'usr_b2c3d4', game:'Murder Mystery',   item:'힌트 5개',        date:'2026.04.26 10:05', vx:100,  status:'completed' },
+    { id:'VXU-20260425-001', user:'usr_e5f6g7', game:'Water Color Sort', item:'프리미엄 팩',     date:'2026.04.25 19:30', vx:250,  status:'completed' },
+    { id:'VXU-20260425-002', user:'usr_h8i9j1', game:'Cryzen.io',       item:'골드 팩 100',    date:'2026.04.25 15:17', vx:100,  status:'completed' },
+  ];
+
+  const STATUS_LABEL = { done:'지급 완료', pending:'지급 예정', processing:'처리 중', cancelled:'취소' };
+  const PAGE_SIZE = 7;
+  let currentPage = 1;
+  let activeSubTab = 'all';
+  let currentDetailRow = null;
+
+  /* ═══════════════════════════════════════════
+     TOAST
+  ═══════════════════════════════════════════ */
+  function showToast(html, color='#1c1c32') {
+    const t = document.createElement('div');
+    t.innerHTML = html;
+    Object.assign(t.style, {
+      position:'fixed', bottom:'24px', right:'24px',
+      background: color,
+      border:'1px solid rgba(139,92,246,0.4)',
+      color:'#f1f0ff', padding:'13px 20px', borderRadius:'10px',
+      fontSize:'13px', fontWeight:'500', zIndex:'9999',
+      boxShadow:'0 4px 24px rgba(0,0,0,0.5)',
+      lineHeight:'1.6', maxWidth:'320px',
+      animation:'slideIn 0.2s ease',
+    });
+    document.body.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); }, 3000);
+  }
+
+  /* ═══════════════════════════════════════════
+     MODAL HELPERS
+  ═══════════════════════════════════════════ */
+  function openModal(id) {
+    const m = document.getElementById(id);
+    m.style.display = 'flex';
+    requestAnimationFrame(() => m.querySelector('div').style.animation = 'modalIn 0.2s ease');
+  }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+  document.addEventListener('click', e => {
+    ['detailModal','settleModal','accountModal'].forEach(id => {
+      const m = document.getElementById(id);
+      if (e.target === m) closeModal(id);
+    });
+  });
+
+  /* ═══════════════════════════════════════════
+     TAB SWITCHING
+  ═══════════════════════════════════════════ */
+  function setTab(el, tabId) {
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    ['overview','history','policy'].forEach(id => {
+      const el = document.getElementById('tab-' + id);
+      if (el) el.style.display = id === tabId ? 'block' : 'none';
+    });
+  }
+
+  function setPeriod(el) {
+    el.closest('.date-pills').querySelectorAll('.date-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+
+    const rangeMap = {
+      '오늘':  [today(0), today(0)],
+      '7일':   [today(-7), today(0)],
+      '이번 달':[monthStart(), today(0)],
+      '지난 달':[lastMonthStart(), lastMonthEnd()],
+      '3개월': [today(-90), today(0)],
+      '6개월': [today(-180), today(0)],
+      '올해':  [yearStart(), today(0)],
+      '1년':   [today(-365), today(0)],
+    };
+    const range = rangeMap[el.textContent.trim()];
+    if (range) {
+      const inputs = el.closest('.date-filter').querySelectorAll('.date-input');
+      if (inputs.length === 2) { inputs[0].value = range[0]; inputs[1].value = range[1]; }
+    }
+    renderTable();
+  }
+
+  function today(offset=0) {
+    const d = new Date('2026-05-04');
+    d.setDate(d.getDate() + offset);
+    return d.toISOString().slice(0,10);
+  }
+  function monthStart()     { return '2026-05-01'; }
+  function lastMonthStart() { return '2026-04-01'; }
+  function lastMonthEnd()   { return '2026-04-30'; }
+  function yearStart()      { return '2026-01-01'; }
+
+  /* ═══════════════════════════════════════════
+     TABLE RENDERING
+  ═══════════════════════════════════════════ */
+  function getFilteredRows() {
+    const q      = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const game   = document.getElementById('gameFilter')?.value || '전체 게임';
+    const status = document.getElementById('statusFilter')?.value || '전체 상태';
+
+    return ALL_ROWS.filter(r => {
+      if (activeSubTab !== 'all' && r.status !== activeSubTab) return false;
+      if (q && !r.id.toLowerCase().includes(q) && !r.game.toLowerCase().includes(q)) return false;
+      if (game !== '전체 게임' && r.game !== game) return false;
+      const sMap = { '지급 완료':'done', '지급 예정':'pending', '처리 중':'processing' };
+      if (status !== '전체 상태' && r.status !== sMap[status]) return false;
+      return true;
+    });
+  }
+
+  function renderTable() {
+    const rows = getFilteredRows();
+    const total = rows.length;
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const pageRows = rows.slice((currentPage-1)*PAGE_SIZE, currentPage*PAGE_SIZE);
+    const tbody = document.getElementById('settlementTbody');
+
+    if (pageRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#4b5563;font-size:13px;">검색 결과가 없습니다</td></tr>`;
+    } else {
+      tbody.innerHTML = pageRows.map(r => `
+        <tr>
+          <td class="mono">${r.id}</td>
+          <td><span style="font-weight:500;color:#f1f0ff">${r.game}</span></td>
+          <td>${r.base}</td>
+          <td>${r.notify}</td>
+          <td>${r.pay}</td>
+          <td class="right"><span style="color:#22d3ee;font-weight:600;">${r.vx.toLocaleString()}</span> <span style="font-size:10px;color:#4b5563;">VX</span></td>
+          <td class="right amount positive">~$${r.revenue.toLocaleString()}</td>
+          <td class="center"><span class="status-badge ${r.status}">${STATUS_LABEL[r.status]}</span></td>
+          <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="openDetail('${r.id}')">상세</button></td>
+        </tr>`).join('');
+    }
+
+    // count
+    const countEl = document.querySelector('.table-count span');
+    if (countEl) countEl.textContent = total;
+
+    // page info
+    const start = total === 0 ? 0 : (currentPage-1)*PAGE_SIZE+1;
+    const end   = Math.min(currentPage*PAGE_SIZE, total);
+    const pageInfo = document.querySelector('.page-info');
+    if (pageInfo) pageInfo.textContent = `${start} - ${end} / ${total}건`;
+
+    // pagination buttons
+    const pagebtns = document.querySelector('.page-btns');
+    if (pagebtns) {
+      let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled style="opacity:0.3"':''}>‹</button>`;
+      for (let i=1; i<=totalPages; i++) {
+        html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+      }
+      html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===totalPages?'disabled style="opacity:0.3"':''}>›</button>`;
+      pagebtns.innerHTML = html;
+    }
+  }
+
+  function goPage(p) {
+    const rows = getFilteredRows();
+    const max = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+    currentPage = Math.max(1, Math.min(p, max));
+    renderTable();
+  }
+
+  /* ═══════════════════════════════════════════
+     SUB-TABS
+  ═══════════════════════════════════════════ */
+  function setSubTab(el, id) {
+    el.closest('.section-tabs').querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    activeSubTab = id;
+    currentPage = 1;
+    renderTable();
+  }
+
+  /* ═══════════════════════════════════════════
+     SEARCH & FILTER (live)
+  ═══════════════════════════════════════════ */
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput  = document.getElementById('searchInput');
+    const gameFilter   = document.getElementById('gameFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    if (searchInput)  searchInput.addEventListener('input',  () => { currentPage=1; renderTable(); });
+    if (gameFilter)   gameFilter.addEventListener('change',  () => { currentPage=1; renderTable(); });
+    if (statusFilter) statusFilter.addEventListener('change', () => { currentPage=1; renderTable(); });
+    renderTable();
+  });
+
+  /* ═══════════════════════════════════════════
+     DETAIL MODAL
+  ═══════════════════════════════════════════ */
+  function openDetail(id) {
+    const r = ALL_ROWS.find(x => x.id === id);
+    if (!r) return;
+    currentDetailRow = r;
+    document.getElementById('detailTitle').textContent = `${r.game} — 정산 상세`;
+    document.getElementById('detailId').textContent = r.id;
+
+    const statusColor = { done:'#34d399', pending:'#a78bfa', processing:'#fb923c', cancelled:'#4b5563' };
+    document.getElementById('detailBody').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
+        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">VX 소모량</div>
+          <div style="font-size:18px;font-weight:700;color:#22d3ee;">${r.vx.toLocaleString()}<span style="font-size:11px;font-weight:400;color:#4b5563;margin-left:3px;">VX</span></div>
+        </div>
+        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">총 플레이 수</div>
+          <div style="font-size:18px;font-weight:700;color:#f1f0ff;">${r.plays.toLocaleString()}</div>
+        </div>
+        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">예상 기여금</div>
+          <div style="font-size:18px;font-weight:700;color:#34d399;">~$${r.revenue.toLocaleString()}</div>
+        </div>
+      </div>
+      <div style="background:#1c1c32;border-radius:10px;padding:4px 0;">
+        ${[
+          ['정산 기준일', r.base],
+          ['기여 내역 제공', r.notify],
+          ['지급 예정일', r.pay],
+          ['지급 상태', `<span style="color:${statusColor[r.status]};font-weight:600;">${STATUS_LABEL[r.status]}</span>`],
+          ['게임명', r.game],
+          ['정산 계좌', '카카오뱅크 3333-••••-••••'],
+        ].map(([k,v]) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(139,92,246,0.08);">
+            <span style="font-size:12px;color:#4b5563;">${k}</span>
+            <span style="font-size:12px;font-weight:500;color:#f1f0ff;">${v}</span>
+          </div>`).join('')}
+      </div>
+      <div style="font-size:11px;color:#4b5563;margin-top:12px;line-height:1.6;">
+        ※ 예상 기여금은 VX 소모량·플레이 지표·재방문율을 종합한 추정치이며, 최종 금액은 익월 5일 내역 확정 후 결정됩니다.
+      </div>`;
+    openModal('detailModal');
+  }
+
+  function downloadDetailCSV() {
+    const r = currentDetailRow;
+    if (!r) return;
+    const csv = `정산ID,게임명,기준일,내역제공일,지급예정일,총플레이,예상수익,상태\n"${r.id}","${r.game}","${r.base}","${r.notify}","${r.pay}","${r.plays}","$${r.revenue}","${STATUS_LABEL[r.status]}"`;
+    downloadFile(`settlement_${r.id}.csv`, csv);
+    showToast('✅ 다운로드 완료');
+  }
+
+  /* ═══════════════════════════════════════════
+     EXPORT CSV (전체 필터 결과)
+  ═══════════════════════════════════════════ */
+  function exportData() {
+    const rows = getFilteredRows();
+    const header = '정산ID,게임명,기준일,내역제공일,지급예정일,총플레이,예상수익,상태';
+    const body = rows.map(r =>
+      `"${r.id}","${r.game}","${r.base}","${r.notify}","${r.pay}","${r.plays}","$${r.revenue}","${STATUS_LABEL[r.status]}"`
+    ).join('\n');
+    downloadFile('verse8_settlement_export.csv', header + '\n' + body);
+    showToast(`📥 <strong>${rows.length}건</strong> 다운로드 완료`);
+  }
+
+  function downloadFile(filename, content) {
+    const blob = new Blob(['﻿' + content], { type:'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = Object.assign(document.createElement('a'), { href:url, download:filename });
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 500);
+  }
+
+  /* ═══════════════════════════════════════════
+     정산 신청 MODAL
+  ═══════════════════════════════════════════ */
+  function requestSettle() { openModal('settleModal'); }
+
+  function confirmSettle() {
+    closeModal('settleModal');
+    showToast('✅ <strong>정산 신청 완료</strong><br><span style="font-size:11px;color:#94a3b8">내역 제공: 익월 5일 이내 · 지급: 익월 말 영업일</span>',
+      'linear-gradient(135deg,rgba(139,92,246,0.95),rgba(34,211,238,0.85))');
+  }
+
+  /* ═══════════════════════════════════════════
+     계좌 수정 MODAL
+  ═══════════════════════════════════════════ */
+  function openAccountEdit() { openModal('accountModal'); }
+
+  function saveAccount() {
+    const bank = document.getElementById('bankSelect').value;
+    const name = document.getElementById('accountName').value.trim();
+    const num  = document.getElementById('accountNum').value.trim();
+    if (!name || !num) { showToast('⚠ 모든 항목을 입력해주세요.'); return; }
+    const masked = num.slice(0, 4) + '-••••-' + num.slice(-4);
+    document.querySelector('.account-val:nth-of-type(1)') // bank
+    document.querySelectorAll('.account-val')[0].childNodes[0].textContent = bank + ' ';
+    document.querySelectorAll('.account-val')[1].textContent = name;
+    document.querySelectorAll('.account-val')[2].childNodes[0].textContent = masked + ' ';
+    closeModal('accountModal');
+    showToast('✅ 계좌 정보가 저장되었습니다.<br><span style="font-size:11px;color:#94a3b8">다음 정산 주기부터 적용됩니다</span>');
+  }
+
+  /* ═══════════════════════════════════════════
+     복사 버튼
+  ═══════════════════════════════════════════ */
+  function copyAccount() {
+    navigator.clipboard.writeText('333312345678').then(() => {
+      showToast('📋 계좌번호가 복사되었습니다');
+    });
+  }
+
+  /* ═══════════════════════════════════════════
+     CHART
+  ═══════════════════════════════════════════ */
+  const ctx = document.getElementById('settlementChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['12월','1월','2월','3월','4월','5월'],
+      datasets: [
+        {
+          label: 'VX 유통량',
+          data: [2320, 2610, 2980, 3140, 3486, 1820],
+          backgroundColor: 'rgba(139,92,246,0.4)',
+          borderColor: 'rgba(139,92,246,0.8)',
+          borderWidth: 1.5, borderRadius: 4,
+          barPercentage: 0.6, categoryPercentage: 0.7,
+          yAxisID: 'y',
+        },
+        {
+          label: '예상 기여금',
+          data: [1189, 1293, 1836, 2139, 2951, null],
+          backgroundColor: 'rgba(34,211,238,0.35)',
+          borderColor: 'rgba(34,211,238,0.7)',
+          borderWidth: 1.5, borderRadius: 4,
+          barPercentage: 0.6, categoryPercentage: 0.7,
+          yAxisID: 'y2',
+          type: 'line',
+          tension: 0.4,
+          pointBackgroundColor: '#22d3ee',
+          pointRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode:'index', intersect:false },
+      plugins: {
+        legend: { display:false },
+        tooltip: {
+          backgroundColor: 'rgba(13,13,20,0.95)',
+          borderColor: 'rgba(139,92,246,0.3)', borderWidth:1,
+          titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12,
+          callbacks: {
+            label: c => c.datasetIndex===0
+              ? `  VX 유통량: ${(c.parsed.y*1000).toLocaleString()} VX`
+              : `  예상 기여금: ~$${(c.parsed.y).toLocaleString()}`
+          }
+        }
+      },
+      scales: {
+        x: { grid:{display:false}, ticks:{color:'#4b5563',font:{size:11}}, border:{color:'rgba(139,92,246,0.1)'} },
+        y: { grid:{color:'rgba(139,92,246,0.07)'}, ticks:{color:'#4b5563',font:{size:11},callback:v=>v+'K VX'}, border:{display:false} },
+        y2:{ display:false }
+      }
+    }
+  });
+
+  /* ═══════════════════════════════════════════
+     PAGE RENDER FUNCTIONS
+  ═══════════════════════════════════════════ */
+  function renderDashboard(el) {
+    el.innerHTML = `
+      <div style="padding:0 0 32px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+          ${[
+            {label:'이번 달 예상 기여금',val:'~$2,951',sub:'+12.4% 전월 대비',color:'#34d399',icon:'🏦'},
+            {label:'이번 달 VX 유통량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#22d3ee',icon:'🪙'},
+            {label:'총 플레이 수',val:'752,000',sub:'+12.1% 전월 대비',color:'#a78bfa',icon:'🎮'},
+            {label:'활성 유저',val:'48,320',sub:'+9.3% 전월 대비',color:'#fb923c',icon:'👥'},
+          ].map(c=>`
+            <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+              <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
+              <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+              <div style="font-size:26px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
+              <div style="font-size:11px;color:#34d399;">${c.sub}</div>
+            </div>`).join('')}
+        </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;">
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">월별 수익 추이</div>
+            <div style="display:flex;gap:4px;align-items:flex-end;height:120px;">
+              ${[488,574,783,876,995,1124].map((v,i)=>{
+                const months=['12월','1월','2월','3월','4월','5월'];
+                const h=Math.round(v/1124*100);
+                return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
+                  <div style="font-size:9px;color:#4b5563;">$${v}</div>
+                  <div style="width:100%;height:${h}px;background:linear-gradient(180deg,rgba(139,92,246,0.7),rgba(34,211,238,0.4));border-radius:4px 4px 0 0;"></div>
+                  <div style="font-size:9px;color:#4b5563;">${months[i]}</div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">게임별 비중</div>
+            ${[
+              {name:'Cryzen.io',pct:42,color:'#8b5cf6'},
+              {name:'Water Color Sort',pct:28,color:'#22d3ee'},
+              {name:'Lands of Blight',pct:17,color:'#34d399'},
+              {name:'Murder Mystery',pct:13,color:'#fb923c'},
+            ].map(g=>`
+              <div style="margin-bottom:10px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                  <span style="font-size:11px;color:#94a3b8;">${g.name}</span>
+                  <span style="font-size:11px;color:${g.color};font-weight:600;">${g.pct}%</span>
+                </div>
+                <div style="height:4px;background:#1c1c32;border-radius:2px;">
+                  <div style="height:4px;width:${g.pct}%;background:${g.color};border-radius:2px;"></div>
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">최근 활동</div>
+          ${[
+            {icon:'💸',text:'Cryzen.io 4월 정산금 $1,124 지급 완료',time:'3시간 전',color:'#34d399'},
+            {icon:'📋',text:'Water Color Sort 4월 정산 내역 제공됨',time:'어제',color:'#a78bfa'},
+            {icon:'🎮',text:'Count Control Legends 새 버전 배포',time:'2일 전',color:'#22d3ee'},
+            {icon:'👤',text:'신규 유저 1,240명 등록',time:'3일 전',color:'#fb923c'},
+          ].map(a=>`
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+              <div style="width:34px;height:34px;background:#1c1c32;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">${a.icon}</div>
+              <div style="flex:1;font-size:12px;color:#94a3b8;">${a.text}</div>
+              <div style="font-size:11px;color:#4b5563;">${a.time}</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  }
+
+  function renderGames(el) {
+    const games = [
+      {name:'Cryzen.io',       engine:'자체엔진',  plays:'142,300', vx:'1,247,800', contrib:'~$1,124', users:'12,400', updated:'2026.04.30'},
+      {name:'Water Color Sort',engine:'Cocos2D',   plays:'93,450',  vx:'620,300',   contrib:'~$743',   users:'8,920',  updated:'2026.04.30'},
+      {name:'Lands of Blight', engine:'Defold',    plays:'75,820',  vx:'910,100',   contrib:'~$602',   users:'6,740',  updated:'2026.04.29'},
+      {name:'Murder Mystery',  engine:'PixiJS',    plays:'60,110',  vx:'428,400',   contrib:'~$482',   users:'5,200',  updated:'2026.04.28'},
+      {name:'Count Control',   engine:'Unity WebGL',plays:'52,400', vx:'374,200',   contrib:'~$416',   users:'4,600',  updated:'2026.04.27'},
+    ];
+    el.innerHTML = `
+      <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+        <div style="flex:1;">
+          <input placeholder="게임 검색..." style="width:100%;box-sizing:border-box;background:#131322;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:9px 14px;color:#f1f0ff;font-size:13px;outline:none;" />
+        </div>
+        <button class="btn btn-primary" onclick="showToast('🎮 게임 등록 기능은 준비 중입니다.')">+ 게임 등록</button>
+      </div>
+      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:rgba(139,92,246,0.06);">
+              ${['게임명','엔진','상태','이번 달 플레이','VX 소모량','예상 기여금','활성 유저','최근 업데이트',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${games.map(g=>`
+              <tr style="border-top:1px solid rgba(139,92,246,0.08);" onmouseover="this.style.background='rgba(139,92,246,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#f1f0ff;">${g.name}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#4b5563;">${g.engine}</td>
+                <td style="padding:14px 16px;"><span style="background:rgba(52,211,153,0.12);color:#34d399;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● 활성</span></td>
+                <td style="padding:14px 16px;font-size:13px;color:#f1f0ff;">${g.plays}</td>
+                <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#22d3ee;">${g.vx} <span style="font-size:10px;font-weight:400;color:#4b5563;">VX</span></td>
+                <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#34d399;">${g.contrib}</td>
+                <td style="padding:14px 16px;font-size:13px;color:#94a3b8;">${g.users}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#4b5563;">${g.updated}</td>
+                <td style="padding:14px 16px;">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📊 ${g.name} 상세 분석으로 이동합니다.')">분석</button>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  function renderAds(el) {
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+        ${[
+          {label:'이번 달 광고 수익',val:'~$2,340',sub:'+22.1% 전월 대비',color:'#22d3ee',icon:'📢'},
+          {label:'광고 노출 수',val:'1,842,000',sub:'CPM $1.27',color:'#a78bfa',icon:'👁️'},
+          {label:'광고 클릭 수',val:'38,420',sub:'CTR 2.09%',color:'#34d399',icon:'🖱️'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+            <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
+            <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:26px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
+            <div style="font-size:11px;color:#34d399;">${c.sub}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:6px;">광고 유형별 수익</div>
+        <div style="font-size:12px;color:#4b5563;margin-bottom:18px;">2026년 5월 기준 (추정치)</div>
+        ${[
+          {type:'동영상 광고 (Rewarded)',rev:'~$1,420',imp:'824,000',fill:'94.2%',color:'#8b5cf6'},
+          {type:'전면 광고 (Interstitial)',rev:'~$680',imp:'521,000',fill:'88.7%',color:'#22d3ee'},
+          {type:'배너 광고 (Banner)',rev:'~$240',imp:'497,000',fill:'79.4%',color:'#34d399'},
+        ].map(a=>`
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+            <div style="width:10px;height:10px;border-radius:50%;background:${a.color};flex-shrink:0;"></div>
+            <div style="flex:1;font-size:13px;color:#f1f0ff;">${a.type}</div>
+            <div style="text-align:right;min-width:90px;font-size:13px;font-weight:600;color:#34d399;">${a.rev}</div>
+            <div style="text-align:right;min-width:90px;font-size:12px;color:#4b5563;">노출 ${a.imp}</div>
+            <div style="text-align:right;min-width:70px;font-size:12px;color:#94a3b8;">충전율 ${a.fill}</div>
+          </div>`).join('')}
+      </div>
+      <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:18px;">💡</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#22d3ee;margin-bottom:4px;">광고 수익 최적화 팁</div>
+          <div style="font-size:12px;color:#94a3b8;line-height:1.6;">Rewarded 광고를 게임 내 보상 시스템과 연동하면 평균 34% 더 높은 수익을 기대할 수 있습니다. 광고 배치 최적화 가이드를 참고해 보세요.</div>
+          <button style="margin-top:8px;background:none;border:1px solid rgba(34,211,238,0.3);color:#22d3ee;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;" onclick="showToast('📄 가이드 페이지로 이동합니다.')">가이드 보기 →</button>
+        </div>
+      </div>`;
+  }
+
+  function renderTax(el) {
+    el.innerHTML = `
+      <div style="background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;gap:12px;align-items:flex-start;">
+        <span style="font-size:18px;">📋</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#fb923c;margin-bottom:4px;">세금 서류 안내</div>
+          <div style="font-size:12px;color:#94a3b8;line-height:1.6;">Verse8은 글로벌 크리에이터 정산 플랫폼으로, 거주 국가에 따라 원천징수 세율이 다를 수 있습니다. 아래 서류를 제출하여 최적의 세율 혜택을 받으세요.</div>
+        </div>
+      </div>
+      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">세금 서류 현황</div>
+        ${[
+          {doc:'W-8BEN (비미국 개인)',status:'제출 완료',date:'2026.01.15',color:'#34d399',badge:'done'},
+          {doc:'사업자등록증 사본',status:'제출 완료',date:'2026.01.15',color:'#34d399',badge:'done'},
+          {doc:'2025년 지급조서',status:'발급 가능',date:'2026.02.10',color:'#a78bfa',badge:'pending'},
+          {doc:'2026년 1분기 지급조서',status:'발급 예정',date:'2026.07.31',color:'#4b5563',badge:'processing'},
+        ].map(d=>`
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+            <span style="font-size:18px;">📄</span>
+            <div style="flex:1;">
+              <div style="font-size:13px;color:#f1f0ff;font-weight:500;">${d.doc}</div>
+              <div style="font-size:11px;color:#4b5563;margin-top:2px;">${d.date}</div>
+            </div>
+            <span class="status-badge ${d.badge}">${d.status}</span>
+            ${d.badge==='pending'?`<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📥 ${d.doc} 다운로드 시작')">다운로드</button>`:''}
+          </div>`).join('')}
+      </div>
+      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:6px;">원천징수 현황</div>
+        <div style="font-size:12px;color:#4b5563;margin-bottom:16px;">2026년 누계</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          ${[
+            {label:'총 지급액',val:'$6,728',color:'#f1f0ff'},
+            {label:'원천징수액',val:'$0',color:'#34d399'},
+            {label:'실 지급액',val:'$6,728',color:'#a78bfa'},
+          ].map(s=>`
+            <div style="background:#1c1c32;border-radius:10px;padding:14px 16px;text-align:center;">
+              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${s.label}</div>
+              <div style="font-size:20px;font-weight:700;color:${s.color};">${s.val}</div>
+            </div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:#4b5563;margin-top:12px;line-height:1.6;">※ W-8BEN 제출로 조세조약 적용 중 (한-미 조세조약 0% 적용). 국가별 세율은 상이할 수 있습니다.</div>
+      </div>`;
+  }
+
+  function renderUsers(el) {
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        ${[
+          {label:'총 유저 수',val:'48,320',sub:'+9.3% 전월 대비',color:'#a78bfa',icon:'👥'},
+          {label:'DAU',val:'12,840',sub:'전일 대비 +340',color:'#22d3ee',icon:'📅'},
+          {label:'월 리텐션',val:'68.4%',sub:'+2.1pp 전월 대비',color:'#34d399',icon:'🔄'},
+          {label:'평균 플레이 시간',val:'14.2분',sub:'전월 12.8분',color:'#fb923c',icon:'⏱️'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+            <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
+            <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:24px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
+            <div style="font-size:11px;color:#34d399;">${c.sub}</div>
+          </div>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">국가별 유저 분포</div>
+          ${[
+            {country:'🇰🇷 대한민국',pct:38,count:'18,362'},
+            {country:'🇺🇸 미국',pct:22,count:'10,630'},
+            {country:'🇯🇵 일본',pct:14,count:'6,765'},
+            {country:'🇧🇷 브라질',pct:9,count:'4,349'},
+            {country:'기타',pct:17,count:'8,214'},
+          ].map(c=>`
+            <div style="margin-bottom:10px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span style="font-size:12px;color:#94a3b8;">${c.country}</span>
+                <span style="font-size:12px;color:#4b5563;">${c.count}명 (${c.pct}%)</span>
+              </div>
+              <div style="height:5px;background:#1c1c32;border-radius:3px;">
+                <div style="height:5px;width:${c.pct}%;background:linear-gradient(90deg,#8b5cf6,#22d3ee);border-radius:3px;"></div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">플랫폼별 유저</div>
+          ${[
+            {platform:'모바일 (Android)',pct:52,color:'#34d399'},
+            {platform:'모바일 (iOS)',pct:28,color:'#a78bfa'},
+            {platform:'PC/웹',pct:20,color:'#22d3ee'},
+          ].map(p=>`
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span style="font-size:12px;color:#94a3b8;">${p.platform}</span>
+                <span style="font-size:13px;font-weight:600;color:${p.color};">${p.pct}%</span>
+              </div>
+              <div style="height:8px;background:#1c1c32;border-radius:4px;">
+                <div style="height:8px;width:${p.pct}%;background:${p.color};border-radius:4px;opacity:0.8;"></div>
+              </div>
+            </div>`).join('')}
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(139,92,246,0.1);">
+            <div style="font-size:11px;color:#4b5563;margin-bottom:8px;">신규 유저 획득</div>
+            <div style="font-size:24px;font-weight:700;color:#f1f0ff;">+4,820 <span style="font-size:13px;color:#34d399;">이번 달</span></div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderAbtest(el) {
+    el.innerHTML = `
+      <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
+        <div style="flex:1;">
+          <div style="font-size:13px;color:#94a3b8;">진행 중인 A/B 테스트 <strong style="color:#a78bfa;">3</strong>개 · 완료 <strong style="color:#4b5563;">8</strong>개</div>
+        </div>
+        <button class="btn btn-primary" onclick="showToast('🧪 새 A/B 테스트 생성 기능은 준비 중입니다.')">+ 새 테스트</button>
+      </div>
+      ${[
+        {name:'가격 탄력성 테스트',game:'Cryzen.io',status:'running',start:'2026.04.20',variant_a:'기존 $0.99',variant_b:'$1.49 + 보너스',conv_a:'4.2%',conv_b:'5.8%',winner:'B',progress:72},
+        {name:'튜토리얼 흐름 최적화',game:'Water Color Sort',status:'running',start:'2026.04.25',variant_a:'기존 튜토리얼 (5단계)',variant_b:'간소화 (3단계)',conv_a:'61.4%',conv_b:'74.1%',winner:'B',progress:45},
+        {name:'홈 화면 레이아웃',game:'Lands of Blight',status:'running',start:'2026.04.28',variant_a:'그리드형',variant_b:'리스트형',conv_a:'8.3%',conv_b:'8.7%',winner:'?',progress:18},
+      ].map(t=>`
+        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+            <span style="background:rgba(52,211,153,0.12);color:#34d399;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● 진행 중</span>
+            <span style="font-size:14px;font-weight:600;color:#f1f0ff;">${t.name}</span>
+            <span style="font-size:11px;color:#4b5563;margin-left:auto;">${t.game} · ${t.start} ~</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div style="background:#1c1c32;border-radius:10px;padding:14px;${t.winner==='A'?'border:1px solid rgba(34,211,238,0.4);':''}">
+              <div style="font-size:10px;color:#4b5563;margin-bottom:6px;">A: ${t.variant_a}</div>
+              <div style="font-size:22px;font-weight:700;color:#94a3b8;">${t.conv_a}</div>
+              <div style="font-size:10px;color:#4b5563;margin-top:2px;">전환율</div>
+            </div>
+            <div style="background:#1c1c32;border-radius:10px;padding:14px;${t.winner==='B'?'border:1px solid rgba(139,92,246,0.5);':''}">
+              <div style="font-size:10px;color:#4b5563;margin-bottom:6px;">B: ${t.variant_b}</div>
+              <div style="font-size:22px;font-weight:700;color:${t.winner==='B'?'#a78bfa':'#94a3b8'};">${t.conv_b}</div>
+              <div style="font-size:10px;color:#4b5563;margin-top:2px;">전환율</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;height:4px;background:#1c1c32;border-radius:2px;">
+              <div style="height:4px;width:${t.progress}%;background:linear-gradient(90deg,#8b5cf6,#22d3ee);border-radius:2px;"></div>
+            </div>
+            <div style="font-size:11px;color:#4b5563;">진행률 ${t.progress}%</div>
+            <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📊 테스트 상세 결과를 확인합니다.')">상세</button>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  function renderAccountSettings(el) {
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">API 연동</div>
+            <div style="margin-bottom:14px;">
+              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">라이브 API 키</div>
+              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;">
+                <code style="flex:1;font-size:12px;color:#a78bfa;font-family:monospace;">v8_live_pk_placeholder_key</code>
+                <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;" onclick="copyApiKey()">복사</button>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">테스트 API 키</div>
+              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;">
+                <code style="flex:1;font-size:12px;color:#4b5563;font-family:monospace;">v8_test_sk_placeholder_key</code>
+                <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;" onclick="showToast('📋 테스트 키가 복사되었습니다.')">복사</button>
+              </div>
+            </div>
+          </div>
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">Webhook 설정</div>
+            <div style="margin-bottom:12px;">
+              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">Webhook URL</div>
+              <input placeholder="https://your-server.com/webhook" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+            </div>
+            <div style="margin-bottom:16px;">
+              <div style="font-size:11px;color:#4b5563;margin-bottom:8px;">이벤트 구독</div>
+              ${['정산 완료','결제 발생','환불 처리','에러 발생'].map(e=>`
+                <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
+                  <input type="checkbox" ${['정산 완료','결제 발생'].includes(e)?'checked':''} style="accent-color:#8b5cf6;" />
+                  <span style="font-size:12px;color:#94a3b8;">${e}</span>
+                </label>`).join('')}
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="showToast('✅ Webhook 설정이 저장되었습니다.')">저장</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">알림 설정</div>
+            ${[
+              {label:'정산 완료 알림',sub:'정산금 지급 시 이메일 알림',on:true},
+              {label:'월간 리포트',sub:'매월 1일 수익 요약 리포트',on:true},
+              {label:'이상 거래 탐지',sub:'비정상적인 결제 패턴 감지',on:true},
+              {label:'신규 유저 알림',sub:'일일 신규 가입 유저 요약',on:false},
+              {label:'마케팅 메일',sub:'Verse8 뉴스 및 프로모션 정보',on:false},
+            ].map(n=>`
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:#f1f0ff;font-weight:500;">${n.label}</div>
+                  <div style="font-size:11px;color:#4b5563;">${n.sub}</div>
+                </div>
+                <div style="position:relative;width:38px;height:22px;background:${n.on?'#8b5cf6':'#1c1c32'};border-radius:11px;cursor:pointer;transition:background 0.2s;"
+                     onclick="this.style.background=this.style.background==='rgb(139, 92, 246)'?'#1c1c32':'#8b5cf6';showToast('설정이 변경되었습니다.')">
+                  <div style="position:absolute;top:3px;${n.on?'right:3px':'left:3px'};width:16px;height:16px;background:white;border-radius:50%;transition:all 0.2s;"></div>
+                </div>
+              </div>`).join('')}
+          </div>
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">보안 설정</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+              <div>
+                <div style="font-size:12px;color:#f1f0ff;font-weight:500;">2단계 인증 (2FA)</div>
+                <div style="font-size:11px;color:#34d399;">활성화됨 · Google Authenticator</div>
+              </div>
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🔐 2FA 설정 페이지로 이동합니다.')">관리</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+              <div>
+                <div style="font-size:12px;color:#f1f0ff;font-weight:500;">로그인 세션</div>
+                <div style="font-size:11px;color:#4b5563;">현재 활성 세션 2개</div>
+              </div>
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;color:#f87171;" onclick="showToast('⚠ 다른 기기 세션이 종료되었습니다.')">전체 로그아웃</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderProfile(el) {
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;text-align:center;">
+            <div style="width:72px;height:72px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;">🎮</div>
+            <div style="font-size:16px;font-weight:700;color:#f1f0ff;margin-bottom:4px;">Verse8 Dev</div>
+            <div style="font-size:12px;color:#4b5563;margin-bottom:16px;">hakyong@planetariumhq.com</div>
+            <span style="background:linear-gradient(90deg,rgba(139,92,246,0.15),rgba(34,211,238,0.1));border:1px solid rgba(139,92,246,0.3);color:#a78bfa;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;">PRO 플랜</span>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(139,92,246,0.1);">
+              <button class="btn btn-ghost" style="width:100%;margin-bottom:8px;" onclick="showToast('📷 프로필 이미지 변경')">이미지 변경</button>
+            </div>
+          </div>
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:12px;font-weight:600;color:#f1f0ff;margin-bottom:14px;">계정 요약</div>
+            ${[
+              {label:'가입일',val:'2025. 01. 15'},
+              {label:'등록 게임',val:'5개'},
+              {label:'총 수익',val:'~$6,728'},
+              {label:'총 플레이',val:'6,248,000'},
+            ].map(s=>`
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+                <span style="font-size:11px;color:#4b5563;">${s.label}</span>
+                <span style="font-size:11px;font-weight:500;color:#f1f0ff;">${s.val}</span>
+              </div>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">개인 정보</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+              ${[
+                {label:'표시 이름',val:'Verse8 Dev'},
+                {label:'이메일',val:'hakyong@planetariumhq.com'},
+                {label:'연락처',val:'+82 10-0000-0000'},
+                {label:'국가',val:'대한민국'},
+              ].map(f=>`
+                <div>
+                  <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${f.label}</div>
+                  <input value="${f.val}" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+                </div>`).join('')}
+            </div>
+            <button class="btn btn-primary" onclick="showToast('✅ 프로필이 저장되었습니다.')">변경사항 저장</button>
+          </div>
+          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">비밀번호 변경</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
+              ${['현재 비밀번호','새 비밀번호','새 비밀번호 확인'].map(p=>`
+                <div>
+                  <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${p}</div>
+                  <input type="password" placeholder="••••••••" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+                </div>`).join('')}
+            </div>
+            <button class="btn btn-ghost" onclick="showToast('✅ 비밀번호가 변경되었습니다.')">비밀번호 변경</button>
+          </div>
+          <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.2);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#f87171;margin-bottom:8px;">위험 구역</div>
+            <div style="font-size:12px;color:#4b5563;margin-bottom:14px;">계정을 삭제하면 모든 데이터, 게임, 정산 내역이 영구적으로 제거됩니다.</div>
+            <button style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;" onclick="showToast('⚠ 계정 삭제를 위해서는 고객센터에 문의해주세요.')">계정 삭제 요청</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  const PAGE_RENDERERS = {
+    dashboard:       renderDashboard,
+    games:           renderGames,
+    ads:             renderAds,
+    tax:             renderTax,
+    users:           renderUsers,
+    abtest:          renderAbtest,
+    'account-settings': renderAccountSettings,
+    profile:         renderProfile,
+  };
+
+  /* ═══════════════════════════════════════════
+     ANIMATION KEYFRAMES
+  ═══════════════════════════════════════════ */
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn { from{transform:translateX(20px);opacity:0} to{transform:translateX(0);opacity:1} }
+    @keyframes modalIn { from{transform:scale(0.95);opacity:0} to{transform:scale(1);opacity:1} }
+  `;
+  document.head.appendChild(style);
+</script>
+</body>
+</html>
