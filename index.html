@@ -922,7 +922,7 @@
         <span class="notice-icon">💡</span>
         <div class="notice-text">
           <strong>정산 일정 안내:</strong> 4월 기여 내역은 <strong>5월 5일</strong>까지 제공되며, 마케팅 기여금은 <strong>5월 말 영업일</strong>에 등록 계좌로 지급됩니다.
-          표시된 기여금은 게임 내 <strong>VX 판매량 · 플레이 지표 · 재방문율</strong> 등을 종합한 예상치이며, 최종 금액은 내역 확정일에 결정됩니다. 첫 출금은 <strong>$100 이상</strong>부터 가능합니다.
+          표시된 기여금은 VX 판매량 · 플레이 지표 · 재방문율을 종합한 <strong>확정값</strong>이며, 익월 5일 이내 내역 확정 후 출금 가능합니다. 첫 출금은 <strong>$100 이상</strong>부터 가능합니다.
         </div>
       </div>
 
@@ -951,10 +951,10 @@
         <div class="stats-grid">
           <div class="stat-card highlight">
             <div class="stat-header">
-              <span class="stat-label">이번 달 예상 마케팅 기여금</span>
+              <span class="stat-label">이번 달 마케팅 기여금</span>
               <div class="stat-icon purple">🏦</div>
             </div>
-            <div class="stat-value gradient">~$2,951</div>
+            <div class="stat-value gradient">$2,951</div>
             <div class="stat-meta">
               <span class="stat-change up">↑ 12.4%</span>
               <span>지난 달 대비</span>
@@ -978,7 +978,7 @@
               <span class="stat-label">기여금 지급 완료 (연누적)</span>
               <div class="stat-icon green">✅</div>
             </div>
-            <div class="stat-value">~$6,728</div>
+            <div class="stat-value">$6,728</div>
             <div class="stat-meta">
               <span>2026년 1월 ~ 현재</span>
             </div>
@@ -1038,9 +1038,9 @@
                 <div class="breakdown-item">
                   <div class="breakdown-label">
                     <span class="breakdown-dot" style="background:var(--green-400)"></span>
-                    예상 마케팅 기여금
+                    마케팅 기여금
                   </div>
-                  <div class="breakdown-value" style="color:var(--green-400)">~$2,951</div>
+                  <div class="breakdown-value" style="color:var(--green-400)">$2,951</div>
                 </div>
                 <div class="breakdown-item">
                   <div class="breakdown-label">
@@ -1225,7 +1225,7 @@
                 <th>내역 제공일</th>
                 <th>지급 예정일</th>
                 <th class="right">VX 판매량 <span class="info-icon" title="해당 월 게임 내에서 유저들이 소모한 총 VX 수량입니다">?</span></th>
-                <th class="right">예상 기여금 <span class="info-icon" title="VX 판매량·플레이 지표·재방문율을 종합한 예상 마케팅 기여금입니다">?</span></th>
+                <th class="right">기여금 <span class="info-icon" title="VX 판매량·플레이 지표·재방문율을 종합한 마케팅 기여금입니다">?</span></th>
                 <th class="center">상태</th>
                 <th></th>
               </tr>
@@ -2033,7 +2033,7 @@
           <td>${r.notify}</td>
           <td>${r.pay}</td>
           <td class="right"><span style="color:#22d3ee;font-weight:600;">${r.vx.toLocaleString()}</span> <span style="font-size:10px;color:#4b5563;">VX</span></td>
-          <td class="right amount positive">~$${r.revenue.toLocaleString()}</td>
+          <td class="right amount positive">$${r.revenue.toLocaleString()}</td>
           <td class="center"><span class="status-badge ${r.status}">${STATUS_LABEL[r.status]}</span></td>
           <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="openDetail('${r.id}')">상세</button></td>
         </tr>`).join('');
@@ -2114,8 +2114,8 @@
           <div style="font-size:18px;font-weight:700;color:#f1f0ff;">${r.plays.toLocaleString()}</div>
         </div>
         <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
-          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">예상 기여금</div>
-          <div style="font-size:18px;font-weight:700;color:#34d399;">~$${r.revenue.toLocaleString()}</div>
+          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">기여금</div>
+          <div style="font-size:18px;font-weight:700;color:#34d399;">$${r.revenue.toLocaleString()}</div>
         </div>
       </div>
       <div style="background:#1c1c32;border-radius:10px;padding:4px 0;">
@@ -2133,7 +2133,7 @@
           </div>`).join('')}
       </div>
       <div style="font-size:11px;color:#4b5563;margin-top:12px;line-height:1.6;">
-        ※ 예상 기여금은 VX 판매량·플레이 지표·재방문율을 종합한 추정치이며, 최종 금액은 익월 5일 내역 확정 후 결정됩니다.
+        ※ 기여금은 VX 판매량·플레이 지표·재방문율을 종합한 확정값이며, 익월 5일 이내 내역 확정 후 출금 가능합니다.
       </div>`;
     openModal('detailModal');
   }
@@ -2225,7 +2225,7 @@
           yAxisID: 'y',
         },
         {
-          label: '예상 기여금',
+          label: '기여금',
           data: [1189, 1293, 1836, 2139, 2951, null],
           backgroundColor: 'rgba(34,211,238,0.35)',
           borderColor: 'rgba(34,211,238,0.7)',
@@ -2251,7 +2251,7 @@
           callbacks: {
             label: c => c.datasetIndex===0
               ? `  VX 판매량: ${(c.parsed.y*1000).toLocaleString()} VX`
-              : `  예상 기여금: ~$${(c.parsed.y).toLocaleString()}`
+              : `  기여금: $${(c.parsed.y).toLocaleString()}`
           }
         }
       },
@@ -2271,7 +2271,7 @@
       <div style="padding:0 0 32px;">
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
           ${[
-            {label:'이번 달 예상 기여금',val:'~$2,951',sub:'+12.4% 전월 대비',color:'#34d399',icon:'🏦'},
+            {label:'이번 달 마케팅 기여금',val:'$2,951',sub:'+12.4% 전월 대비',color:'#34d399',icon:'🏦'},
             {label:'이번 달 VX 판매량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#22d3ee',icon:'🪙'},
             {label:'총 플레이 수',val:'752,000',sub:'+12.1% 전월 대비',color:'#a78bfa',icon:'🎮'},
             {label:'활성 유저',val:'48,320',sub:'+9.3% 전월 대비',color:'#fb923c',icon:'👥'},
@@ -2336,11 +2336,11 @@
 
   function renderGames(el) {
     const games = [
-      {name:'Cryzen.io',       engine:'자체엔진',  plays:'142,300', vx:'1,247,800', contrib:'~$1,124', users:'12,400', updated:'2026.04.30'},
-      {name:'Water Color Sort',engine:'Cocos2D',   plays:'93,450',  vx:'620,300',   contrib:'~$743',   users:'8,920',  updated:'2026.04.30'},
-      {name:'Lands of Blight', engine:'Defold',    plays:'75,820',  vx:'910,100',   contrib:'~$602',   users:'6,740',  updated:'2026.04.29'},
-      {name:'Murder Mystery',  engine:'PixiJS',    plays:'60,110',  vx:'428,400',   contrib:'~$482',   users:'5,200',  updated:'2026.04.28'},
-      {name:'Count Control',   engine:'Unity WebGL',plays:'52,400', vx:'374,200',   contrib:'~$416',   users:'4,600',  updated:'2026.04.27'},
+      {name:'Cryzen.io',       engine:'자체엔진',  plays:'142,300', vx:'1,247,800', contrib:'$1,124', users:'12,400', updated:'2026.04.30'},
+      {name:'Water Color Sort',engine:'Cocos2D',   plays:'93,450',  vx:'620,300',   contrib:'$743',   users:'8,920',  updated:'2026.04.30'},
+      {name:'Lands of Blight', engine:'Defold',    plays:'75,820',  vx:'910,100',   contrib:'$602',   users:'6,740',  updated:'2026.04.29'},
+      {name:'Murder Mystery',  engine:'PixiJS',    plays:'60,110',  vx:'428,400',   contrib:'$482',   users:'5,200',  updated:'2026.04.28'},
+      {name:'Count Control',   engine:'Unity WebGL',plays:'52,400', vx:'374,200',   contrib:'$416',   users:'4,600',  updated:'2026.04.27'},
     ];
     el.innerHTML = `
       <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
@@ -2353,7 +2353,7 @@
         <table style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="background:rgba(139,92,246,0.06);">
-              ${['게임명','엔진','상태','이번 달 플레이','VX 판매량','예상 기여금','활성 유저','최근 업데이트',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+              ${['게임명','엔진','상태','이번 달 플레이','VX 판매량','기여금','활성 유저','최근 업데이트',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
@@ -2393,7 +2393,7 @@
       </div>
       <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
         <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:6px;">광고 유형별 수익</div>
-        <div style="font-size:12px;color:#4b5563;margin-bottom:18px;">2026년 5월 기준 (추정치)</div>
+        <div style="font-size:12px;color:#4b5563;margin-bottom:18px;">2026년 5월 기준 (확정값)</div>
         ${[
           {type:'동영상 광고 (Rewarded)',rev:'~$1,420',imp:'824,000',fill:'94.2%',color:'#8b5cf6'},
           {type:'전면 광고 (Interstitial)',rev:'~$680',imp:'521,000',fill:'88.7%',color:'#22d3ee'},
@@ -2661,7 +2661,7 @@
             ${[
               {label:'가입일',val:'2025. 01. 15'},
               {label:'등록 게임',val:'5개'},
-              {label:'총 수익',val:'~$6,728'},
+              {label:'총 수익',val:'$6,728'},
               {label:'총 플레이',val:'6,248,000'},
             ].map(s=>`
               <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
