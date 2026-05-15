@@ -988,18 +988,34 @@
       </a>
 
       <div class="nav-group-label" style="margin-top:8px;" data-i18n="nav.group.monetize">수익화</div>
+      <a class="nav-item" data-page="products" onclick="navigate('products')"
+         data-tip="앱인토스 '인앱 결제 > 상품 관리' 대응. VX 패키지·시즌 패스·구독 상품을 등록·관리합니다. 게임 미니앱은 최대 80개, 비게임은 30개까지 등록 가능.">
+        <span class="nav-icon">🛍️</span><span data-i18n="nav.products">상품 관리</span>
+      </a>
       <a class="nav-item" data-page="payments" onclick="navigate('payments')"
          data-tip="유저가 게임 내에서 VX로 아이템을 구매한 트랜잭션 내역입니다. 금액(달러) 없이 VX 수량만 표시됩니다.">
         <span class="nav-icon">💰</span><span data-i18n="nav.payments">결제 내역</span>
         <span class="nav-badge" id="badge-payments">3</span>
       </a>
+      <a class="nav-item" data-page="refunds" onclick="navigate('refunds')"
+         data-tip="앱인토스 '환불 관리' 대응. Android 환불은 파트너가 직접 승인/반려, iOS는 Apple이 전적으로 처리하므로 상태 확인만 가능.">
+        <span class="nav-icon">↩️</span><span data-i18n="nav.refunds">환불 관리</span>
+      </a>
       <a class="nav-item" data-page="ads" onclick="navigate('ads')"
          data-tip="게임 내 광고(Rewarded·Interstitial·Banner) 수익 추정치입니다. 정확한 CPM은 공개되지 않으며 ~$ 추정값으로 표시됩니다.">
         <span class="nav-icon">📢</span><span data-i18n="nav.ads">광고 수익</span>
       </a>
+      <a class="nav-item" data-page="promotions" onclick="navigate('promotions')"
+         data-tip="앱인토스 '프로모션' 대응. VX 포인트 지급, 광고 푸시 캠페인을 운영합니다. 1인당 5,000P 한도, 비즈월렛 충전 필수.">
+        <span class="nav-icon">🎁</span><span data-i18n="nav.promotions">프로모션</span>
+      </a>
       <a class="nav-item active" data-page="settlement" onclick="navigate('settlement')"
          data-tip="VX 판매량 기반 마케팅 기여금 확인 및 출금 신청 페이지입니다. 익월 5일 확정, 익월 말 영업일 지급됩니다.">
         <span class="nav-icon">🏦</span><span data-i18n="nav.settlement">정산 관리</span>
+      </a>
+      <a class="nav-item" data-page="wallet" onclick="navigate('wallet')"
+         data-tip="앱인토스 '비즈 월렛' 대응. 프로모션 운영을 위한 충전식 잔액 (최소 30만원~최대 3,000만원). 인보이스(월 단위)도 여기서 다운로드.">
+        <span class="nav-icon">💼</span><span data-i18n="nav.wallet">비즈 월렛</span>
       </a>
       <a class="nav-item" data-page="tax" onclick="navigate('tax')"
          data-tip="원천징수 영수증, 사업자 등록증 등 세금 관련 서류를 발급·다운로드합니다.">
@@ -1021,6 +1037,14 @@
       </a>
 
       <div class="nav-group-label" style="margin-top:8px;" data-i18n="nav.group.settings">설정</div>
+      <a class="nav-item" data-page="members" onclick="navigate('members')"
+         data-tip="앱인토스 '멤버 관리' 대응. 워크스페이스 팀원을 초대하고 권한(관리자/구성원)을 설정합니다. 워크스페이스는 사업자당 1개만 생성 가능.">
+        <span class="nav-icon">👥</span><span data-i18n="nav.members">멤버 관리</span>
+      </a>
+      <a class="nav-item" data-page="webhooks" onclick="navigate('webhooks')"
+         data-tip="앱인토스 '결제 알림 URL 등록' 대응. 결제·구독 상태 변경 시 호출되는 Webhook 엔드포인트를 관리합니다. 서버 측 결제 검증 / 인벤토리 지급 자동화에 사용.">
+        <span class="nav-icon">🔔</span><span data-i18n="nav.webhooks">결제 알림 URL</span>
+      </a>
       <a class="nav-item" data-page="account-settings" onclick="navigate('account-settings')"
          data-tip="API 키, Webhook URL, 알림 설정, 2FA 보안을 관리합니다.">
         <span class="nav-icon">⚙️</span><span data-i18n="nav.accountSettings">계좌 설정</span>
@@ -1504,8 +1528,16 @@
                 <span class="policy-val" style="color:var(--cyan-400)">$100 이상</span>
               </div>
               <div class="policy-row">
+                <span class="policy-key">월별 최소 정산금</span>
+                <span class="policy-val">₩5,000 미만 시 익월 이월</span>
+              </div>
+              <div class="policy-row">
                 <span class="policy-key">미달 시 처리</span>
                 <span class="policy-val">익월 자동 이월 (누적 후 출금 가능)</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 단위</span>
+                <span class="policy-val">사업자 단위 (모든 게임 합산)</span>
               </div>
             </div>
           </div>
@@ -1652,6 +1684,136 @@
             </div>
           </div>
 
+          <!-- ★ 가이드: 정책 강화 안내 -->
+          <div class="guide-callout" style="grid-column:span 2;">
+            <div class="guide-callout-num">★</div>
+            <div class="guide-callout-body">
+              <div class="guide-callout-title">앱인토스 룰 정합 (신규 정책 카드 3종)</div>
+              <div class="guide-callout-desc">
+                아래 3개 카드는 앱인토스 룰을 그대로 반영한 신규 추가 항목입니다.
+                <br><strong>① 세금계산서 역발행 흐름</strong> — 4단계 타임라인. 익월 4영업일 미승인 시 지급 이월, 2회 미승인 시 운영 중단 페널티.
+                <br><strong>② 인앱 광고(IAA) 정산 구조</strong> — 운영 30% + Verse8 15% (현재 0% 프로모션).
+                <br><strong>③ 인앱 결제(IAP) 정산 구조</strong> — 앱마켓 15-30% + Verse8 5%, 환불 처리 방식.
+              </div>
+            </div>
+          </div>
+
+          <!-- 세금계산서 역발행 흐름 -->
+          <div class="card" style="grid-column:span 2;">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                세금계산서 역발행 & 승인 절차
+              </div>
+              <span style="font-size:11px;color:#fb923c;font-weight:600;">⚠ 승인 필수</span>
+            </div>
+            <div class="card-body">
+              <div style="background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.25);border-radius:10px;padding:14px 18px;margin-bottom:16px;font-size:12px;color:#dbe0e9;line-height:1.7;">
+                Verse8는 매월 정산 시 <strong style="color:#fb923c;">세금계산서를 역발행</strong>합니다.
+                파트너는 발행된 세금계산서를 <strong>익월 4영업일 이내</strong>에 팝빌(또는 동등 서비스)을 통해 <strong style="color:#fb923c;">반드시 승인</strong>해야 합니다.
+                미승인 시 해당 월의 정산금 지급이 다음 달로 이월됩니다.
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;">
+                <div style="background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:10px;padding:14px;text-align:center;">
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">1단계</div>
+                  <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:6px;">매출 발생</div>
+                  <div style="font-size:11px;color:#94a3b8;">당월 1일 ~ 말일</div>
+                </div>
+                <div style="background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:10px;padding:14px;text-align:center;">
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">2단계</div>
+                  <div style="font-size:13px;font-weight:600;color:#ffcb48;margin-bottom:6px;">정산 내역 확정 + 역발행</div>
+                  <div style="font-size:11px;color:#94a3b8;">익월 2~5영업일</div>
+                </div>
+                <div style="background:#0f0f1e;border:1px solid rgba(251,146,60,0.3);border-radius:10px;padding:14px;text-align:center;">
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">3단계</div>
+                  <div style="font-size:13px;font-weight:600;color:#fb923c;margin-bottom:6px;">파트너 승인 (필수)</div>
+                  <div style="font-size:11px;color:#94a3b8;">익월 4영업일 이내</div>
+                </div>
+                <div style="background:#0f0f1e;border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:14px;text-align:center;">
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">4단계</div>
+                  <div style="font-size:13px;font-weight:600;color:#34d399;margin-bottom:6px;">정산금 지급</div>
+                  <div style="font-size:11px;color:#94a3b8;">익월 말 영업일</div>
+                </div>
+              </div>
+              <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.25);border-radius:10px;padding:12px 16px;font-size:12px;color:#fca5a5;line-height:1.6;">
+                ⚠ <strong>운영 중단 페널티:</strong> 역발행 세금계산서를 <strong>2회 이상 미승인</strong>한 경우, 미니앱 운영이 일시 중단될 수 있습니다.
+              </div>
+            </div>
+          </div>
+
+          <!-- 인앱 광고 정산 구조 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                인앱 광고 (IAA) 정산 구조
+              </div>
+              <span style="font-size:11px;color:#34d399;font-weight:600;">2026.4.30까지 Verse8 수수료 0%</span>
+            </div>
+            <div class="card-body">
+              <div class="policy-row">
+                <span class="policy-key">광고 수익원</span>
+                <span class="policy-val">Rewarded · Interstitial · Banner</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">운영 수수료 (광고 네트워크)</span>
+                <span class="policy-val">광고 매출의 약 30%</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">Verse8 수수료</span>
+                <span class="policy-val" style="color:#34d399;">광고 수익의 15% <strong style="color:#34d399;">(현재 0% 프로모션)</strong></span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 내역 확정</span>
+                <span class="policy-val">익월 2영업일</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">세금계산서 승인 마감</span>
+                <span class="policy-val" style="color:#fb923c;">익월 4영업일까지</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산금 지급</span>
+                <span class="policy-val highlight">익월 말 영업일 (승인 완료 시)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 인앱 결제 정산 구조 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <span class="card-title-dot"></span>
+                인앱 결제 (IAP) 정산 구조
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="policy-row">
+                <span class="policy-key">매출원</span>
+                <span class="policy-val">VX 패키지 / 비소모품 / 구독</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">앱마켓 수수료</span>
+                <span class="policy-val">15% (소규모) ~ 30%</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">Verse8 수수료</span>
+                <span class="policy-val">결제 금액의 5%</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산 내역 확정</span>
+                <span class="policy-val highlight">익월 5일 이내</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">정산금 지급</span>
+                <span class="policy-val highlight">익월 말 영업일</span>
+              </div>
+              <div class="policy-row">
+                <span class="policy-key">환불 처리</span>
+                <span class="policy-val">Android 직접 / iOS Apple 관리</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div> <!-- /page-settlement -->
@@ -1660,6 +1822,12 @@
     <div id="page-dashboard" style="display:none;"></div>
     <div id="page-games" style="display:none;"></div>
     <div id="page-game-detail" style="display:none;"></div>
+    <div id="page-products" style="display:none;"></div>
+    <div id="page-refunds" style="display:none;"></div>
+    <div id="page-promotions" style="display:none;"></div>
+    <div id="page-wallet" style="display:none;"></div>
+    <div id="page-members" style="display:none;"></div>
+    <div id="page-webhooks" style="display:none;"></div>
 
     <!-- ══════════ PAGE: 결제 내역 (VX 사용 내역) ══════════ -->
     <div id="page-payments" style="display:none;">
@@ -1837,8 +2005,14 @@
   const PAGE_CONFIG = {
     dashboard:        { title:'한눈에 보기',   sub:'실시간 현황',       actions:'' },
     games:            { title:'게임 관리',      sub:'등록 게임 5개',     actions:'<button class="btn btn-primary" onclick="showToast(\'🎮 게임 등록 기능은 준비 중입니다.\')">+ 게임 등록</button>' },
+    products:         { title:'상품 관리',      sub:'IAP 상품 (게임 80개 한도)', actions:'<button class="btn btn-primary" onclick="showToast(\'🛍️ 상품 등록\')">+ 상품 등록</button>' },
     payments:         { title:'결제 내역',      sub:'2026년 5월 기준',   actions:'<button class="btn btn-ghost" onclick="exportPayments()">⬇ 내보내기</button>' },
+    refunds:          { title:'환불 관리',      sub:'Android 직접 처리 · iOS 확인',  actions:'' },
     ads:              { title:'광고 수익',      sub:'2026년 5월 기준',   actions:'' },
+    promotions:       { title:'프로모션',        sub:'토스 포인트 · 광고 푸시 캠페인', actions:'<button class="btn btn-primary" onclick="showToast(\'🎁 새 캠페인\')">+ 새 캠페인</button>' },
+    wallet:           { title:'비즈 월렛',       sub:'프로모션 운영 충전금',         actions:'<button class="btn btn-primary" onclick="showToast(\'💼 충전 페이지로 이동\')">+ 충전</button>' },
+    members:          { title:'멤버 관리',       sub:'팀원 · 권한',                  actions:'<button class="btn btn-primary" onclick="showToast(\'👥 팀원 초대\')">+ 팀원 초대</button>' },
+    webhooks:         { title:'결제 알림 URL',   sub:'Webhook 엔드포인트',           actions:'<button class="btn btn-primary" onclick="showToast(\'🔔 새 엔드포인트 등록\')">+ 엔드포인트</button>' },
     settlement:       { title:'정산 관리',      sub:'2026년 5월 기준',   actions:`<div class="tab-list"><div class="tab-item active" onclick="setTab(this,'overview')">정산 현황</div><div class="tab-item" onclick="setTab(this,'history')">정산 내역</div><div class="tab-item" onclick="setTab(this,'policy')">정산 정책</div></div><button class="btn btn-ghost" onclick="exportData()">⬇ 내보내기</button><button class="btn btn-primary" onclick="requestSettle()">정산 신청</button>` },
     tax:              { title:'세금계산서',     sub:'정산 완료 기준',    actions:'<button class="btn btn-primary" onclick="showToast(\'📄 세금계산서 발행 요청이 접수되었습니다.\')">+ 발행 요청</button>' },
     analytics:        { title:'매출 분석',      sub:'최근 6개월',        actions:'' },
@@ -3078,6 +3252,594 @@
         </div>`).join('')}`;
   }
 
+  /* ═══════════════════════════════════════════
+     상품 관리 (IAP)  — 앱인토스: 인앱 결제 > 상품 관리
+  ═══════════════════════════════════════════ */
+  const PRODUCTS_LIST = [
+    {name:'100 VX Pack',   type:'소모품',   vx:100,   status:'판매중', sold:3842, revenue:'$1,920', created:'2025.09.12'},
+    {name:'500 VX Pack',   type:'소모품',   vx:500,   status:'판매중', sold:1284, revenue:'$3,210', created:'2025.09.12'},
+    {name:'1,000 VX Pack', type:'소모품',   vx:1000,  status:'판매중', sold: 720, revenue:'$3,600', created:'2025.10.04'},
+    {name:'2,500 VX Pack', type:'소모품',   vx:2500,  status:'판매중', sold: 318, revenue:'$3,975', created:'2025.10.04'},
+    {name:'시즌 패스 2026 S2', type:'비소모품', vx:1500, status:'판매중', sold:824, revenue:'$3,090', created:'2026.04.01'},
+    {name:'프리미엄 구독 (월)', type:'자동 갱신 구독', vx:300, status:'판매중', sold:412, revenue:'$1,030', created:'2025.12.20'},
+    {name:'한정 무기 스킨 팩', type:'비소모품', vx:800, status:'일시중지', sold:152, revenue:'$760',  created:'2026.02.14'},
+    {name:'할로윈 이벤트 팩', type:'비소모품', vx:600, status:'심사중', sold:0,   revenue:'$0',     created:'2026.05.10'},
+  ];
+
+  function renderProducts(el) {
+    const total = PRODUCTS_LIST.length;
+    const active = PRODUCTS_LIST.filter(p=>p.status==='판매중').length;
+    const sales = PRODUCTS_LIST.reduce((s,p)=>s+p.sold,0).toLocaleString();
+    const best = [...PRODUCTS_LIST].sort((a,b)=>b.sold-a.sold)[0].name;
+    const statusColor = (s) => s==='판매중'?'#34d399' : s==='일시중지'?'#fb923c' : '#11B9D2';
+
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">🛍️</div>
+        <div>
+          <div class="guide-page-banner-title">상품 관리 (IAP)</div>
+          <div class="guide-page-banner-sub">앱인토스 콘솔의 <strong>'인앱 결제 > 상품 관리'</strong> 대응 페이지. 유저가 구매할 VX 패키지·시즌 패스·구독 상품을 등록·관리합니다.</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">①</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">상단 KPI 4종</div>
+          <div class="guide-callout-desc">
+            <strong>등록 상품</strong> — 게임 미니앱은 최대 80개, 비게임은 30개 한도 (앱인토스 정책 그대로).
+            <strong>판매 중</strong> — 활성 상품 수.
+            <strong>이번 달 판매</strong> — 누적 판매 건.
+            <strong>베스트셀러</strong> — 판매량 1위 상품.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+        ${[
+          {label:'등록 상품',      val:`${total} / 80`,        sub:'게임 미니앱 한도', color:'#11B9D2', icon:'🛍️'},
+          {label:'판매 중 상품',   val:active,                  sub:'활성',             color:'#34d399', icon:'✅'},
+          {label:'이번 달 판매',   val:sales,                   sub:'건',               color:'#ffcb48', icon:'📈'},
+          {label:'베스트셀러',     val:best,                    sub:'판매량 1위',       color:'#fb923c', icon:'🏆'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:18px 20px;">
+            <div style="font-size:20px;margin-bottom:8px;">${c.icon}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:${c.label==='베스트셀러'?'14px':'22px'};font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
+            <div style="font-size:11px;color:#94a3b8;">${c.sub}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">②</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">상품 유형 (앱인토스 룰)</div>
+          <div class="guide-callout-desc">
+            <strong>소모품</strong> — 1회 사용 후 소진 (VX 팩).
+            <strong>비소모품</strong> — 영구 보유 (시즌 패스, 스킨).
+            <strong>자동 갱신 구독</strong> — 월간 자동 결제 (프리미엄 멤버십).
+            <br>심사 중 상품은 토스 검토 단계라 노출 안 됨.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,203,72,0.06);border:1px solid rgba(255,203,72,0.25);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#dbe0e9;">
+        💡 <strong>상품 유형 안내:</strong> 소모품(1회 사용 후 소진) · 비소모품(영구 보유) · 자동 갱신 구독(월간) — 게임 미니앱은 최대 80개, 비게임은 최대 30개까지 등록 가능합니다.
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.06);">
+            ${['상품명','유형','VX 가격','상태','이번 달 판매','누적 매출','등록일',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${PRODUCTS_LIST.map(p=>`
+              <tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#ffffff;">${p.name}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${p.type}</td>
+                <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#ffcb48;">${p.vx.toLocaleString()} <span style="font-size:10px;font-weight:400;color:#767d8c;">VX</span></td>
+                <td style="padding:14px 16px;"><span style="background:${statusColor(p.status)}1a;color:${statusColor(p.status)};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● ${p.status}</span></td>
+                <td style="padding:14px 16px;font-size:13px;color:#ffffff;">${p.sold.toLocaleString()}</td>
+                <td style="padding:14px 16px;font-size:13px;color:#34d399;font-weight:600;">${p.revenue}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#767d8c;">${p.created}</td>
+                <td style="padding:14px 16px;text-align:right;">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;margin-right:4px;" onclick="showToast('✏️ ${p.name} 편집')">편집</button>
+                  ${p.status==='판매중'
+                    ? `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('⏸ ${p.name} 일시중지')">일시중지</button>`
+                    : `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('▶ ${p.name} 판매 재개')">판매 재개</button>`}
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════
+     환불 관리 — 앱인토스 룰: Android 직접 / iOS Apple
+  ═══════════════════════════════════════════ */
+  const REFUNDS_LIST = [
+    {id:'RF-20260514-001', date:'2026.05.14 13:42', user:'usr_a1b2c3', pkg:'500 VX Pack',  platform:'Android', reason:'결제 오류',     status:'대기'},
+    {id:'RF-20260513-008', date:'2026.05.13 18:21', user:'usr_d4e5f6', pkg:'1,000 VX',     platform:'iOS',     reason:'미사용',         status:'iOS 처리'},
+    {id:'RF-20260512-014', date:'2026.05.12 09:58', user:'usr_g7h8i9', pkg:'100 VX Pack',  platform:'Android', reason:'중복 결제',     status:'승인'},
+    {id:'RF-20260511-003', date:'2026.05.11 22:14', user:'usr_j0k1l2', pkg:'2,500 VX Pack',platform:'Android', reason:'고객 변심',     status:'반려'},
+    {id:'RF-20260510-021', date:'2026.05.10 11:30', user:'usr_m3n4o5', pkg:'시즌 패스',     platform:'iOS',     reason:'서비스 불만족',  status:'iOS 처리'},
+  ];
+
+  function renderRefunds(el) {
+    const sc = (s) => s==='승인'?'#34d399' : s==='반려'?'#f87171' : s==='대기'?'#ffcb48' : '#11B9D2';
+    const pending = REFUNDS_LIST.filter(r=>r.status==='대기').length;
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">↩️</div>
+        <div>
+          <div class="guide-page-banner-title">환불 관리</div>
+          <div class="guide-page-banner-sub">앱인토스 '환불 관리' 대응. 플랫폼별로 처리 방식이 다릅니다 (Android는 우리가 결정, iOS는 Apple이 처리).</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">⚠</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">플랫폼별 환불 처리 차이 (중요)</div>
+          <div class="guide-callout-desc">
+            <strong style="color:#34d399;">Android</strong> — 파트너사(우리)가 직접 <strong>승인/반려</strong> 결정. UI에 액션 버튼 노출.
+            <br><strong style="color:#11B9D2;">iOS</strong> — Apple이 전적으로 관리. 파트너는 <strong>상태 확인만</strong> 가능, 처리에 개입 불가. 액션 칸은 "Apple 관리"로 표시.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+        ${[
+          {label:'이번 달 환불 요청', val:REFUNDS_LIST.length, color:'#11B9D2', icon:'📥'},
+          {label:'대기 중',           val:pending,              color:'#ffcb48', icon:'⏳'},
+          {label:'승인',              val:REFUNDS_LIST.filter(r=>r.status==='승인').length, color:'#34d399', icon:'✅'},
+          {label:'반려',              val:REFUNDS_LIST.filter(r=>r.status==='반려').length, color:'#f87171', icon:'❌'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:18px 20px;">
+            <div style="font-size:20px;margin-bottom:8px;">${c.icon}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:22px;font-weight:700;color:${c.color};">${c.val}</div>
+          </div>`).join('')}
+      </div>
+
+      <div style="background:rgba(17,185,210,0.05);border:1px solid rgba(17,185,210,0.2);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#dbe0e9;">
+        💡 <strong>플랫폼별 환불 처리:</strong>
+        Android — 파트너사가 직접 <strong>승인 / 반려</strong> 결정.
+        iOS — Apple이 전적으로 관리, 파트너사는 상태 확인만 가능.
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.06);">
+            ${['요청 ID','요청 시각','유저','상품','플랫폼','사유','상태','액션'].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${REFUNDS_LIST.map(r=>`
+              <tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:12px 16px;font-family:monospace;font-size:11px;color:#94a3b8;">${r.id}</td>
+                <td style="padding:12px 16px;font-size:12px;color:#94a3b8;">${r.date}</td>
+                <td style="padding:12px 16px;font-size:12px;color:#94a3b8;font-family:monospace;">${r.user}</td>
+                <td style="padding:12px 16px;font-size:12px;color:#ffffff;">${r.pkg}</td>
+                <td style="padding:12px 16px;font-size:12px;color:#94a3b8;">${r.platform}</td>
+                <td style="padding:12px 16px;font-size:12px;color:#94a3b8;">${r.reason}</td>
+                <td style="padding:12px 16px;"><span style="background:${sc(r.status)}1a;color:${sc(r.status)};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">${r.status}</span></td>
+                <td style="padding:12px 16px;">
+                  ${r.status==='대기' && r.platform==='Android'
+                    ? `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;margin-right:4px;color:#34d399;border-color:rgba(52,211,153,0.3);" onclick="showToast('✅ ${r.id} 승인')">승인</button>
+                       <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;color:#f87171;border-color:rgba(248,113,113,0.3);" onclick="showToast('❌ ${r.id} 반려')">반려</button>`
+                    : r.platform==='iOS'
+                      ? `<span style="font-size:11px;color:#767d8c;">Apple 관리</span>`
+                      : `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🔍 ${r.id} 상세')">상세</button>`}
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════
+     프로모션 — 앱인토스: 프로모션 / 광고 푸시
+  ═══════════════════════════════════════════ */
+  const CAMPAIGNS_LIST = [
+    {name:'5월 신규 유저 환영 포인트', type:'토스 포인트', target:'회원가입', status:'진행중', period:'2026.05.01 ~ 05.31', budget:1500000, used:842000, joins:3680, conv:'62.4%'},
+    {name:'1,000 VX 구매 시 500P 추가', type:'토스 포인트', target:'거래 유도', status:'진행중', period:'2026.05.10 ~ 05.20', budget:800000,  used:312000, joins:1248, conv:'48.1%'},
+    {name:'친구 초대 100P 지급',        type:'토스 포인트', target:'친구 초대', status:'진행중', period:'2026.04.15 ~ 05.31', budget:600000,  used:204000, joins:2040, conv:'71.8%'},
+    {name:'6월 출시 광고 푸시 (Tier A)', type:'광고 푸시',   target:'리타겟팅', status:'예정',   period:'2026.06.01 ~ 06.03', budget:1200000, used:0,      joins:0,    conv:'-'},
+    {name:'4월 시즌 패스 푸시',          type:'광고 푸시',   target:'전체 유저', status:'종료',   period:'2026.04.10 ~ 04.12', budget:500000,  used:482400, joins:8240, conv:'24.6%'},
+  ];
+
+  function renderPromotions(el) {
+    const walletBal = 7240000;
+    const monthUsed = CAMPAIGNS_LIST.reduce((s,c)=>s+c.used,0);
+    const live = CAMPAIGNS_LIST.filter(c=>c.status==='진행중').length;
+    const sc = (s) => s==='진행중'?'#34d399' : s==='예정'?'#ffcb48' : '#767d8c';
+
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">🎁</div>
+        <div>
+          <div class="guide-page-banner-title">프로모션</div>
+          <div class="guide-page-banner-sub">앱인토스 콘솔의 <strong>'프로모션'</strong> 대응. 토스 포인트 지급·광고 푸시 캠페인을 운영하는 페이지입니다.</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">①</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">상단 KPI</div>
+          <div class="guide-callout-desc">
+            <strong>비즈 월렛 잔액</strong> — 캠페인 운영 가능한 충전 잔액 (비즈 월렛 페이지와 연동).
+            <strong>진행 중 캠페인</strong> / <strong>이번 달 사용액</strong> / <strong>평균 전환율</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+        ${[
+          {label:'비즈 월렛 잔액', val:`₩${walletBal.toLocaleString()}`, sub:'프로모션 운영 가능액', color:'#11B9D2', icon:'💼'},
+          {label:'진행 중 캠페인',  val:live,                              sub:'활성',                color:'#34d399', icon:'🎁'},
+          {label:'이번 달 사용액',  val:`₩${monthUsed.toLocaleString()}`,  sub:'5월 누적',            color:'#ffcb48', icon:'💸'},
+          {label:'평균 전환율',     val:'51.2%',                           sub:'캠페인 평균',          color:'#fb923c', icon:'📈'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:18px 20px;">
+            <div style="font-size:20px;margin-bottom:8px;">${c.icon}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:${typeof c.val==='string' && c.val.length>10?'16px':'22px'};font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
+            <div style="font-size:11px;color:#94a3b8;">${c.sub}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">②</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">허용·금지 캠페인 (앱인토스 정책)</div>
+          <div class="guide-callout-desc">
+            <strong style="color:#34d399;">허용</strong> — 회원가입/접속 보상, 거래/구매 유도, 이벤트(설문·퀴즈·미션), 친구 초대, 비게임 확률형(1주 이내).
+            <br><strong style="color:#f87171;">금지</strong> — 게임 앱 확률형/랜덤 보상, 게임 결과 기반 보상, 재화 환전형, 현금 보장형/투자성/사행성.
+            <br>1인당 최대 <strong>5,000 포인트</strong> 한도, 비즈 월렛 잔액 차감 (30만~3,000만원 충전 필수).
+            <br>토스 포인트는 <strong>무상 지급</strong>이라 세금계산서가 발행되지 않습니다.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(255,203,72,0.05);border:1px solid rgba(255,203,72,0.2);border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:12px;color:#dbe0e9;line-height:1.6;">
+        💡 <strong>프로모션 정책:</strong> 1인당 최대 5,000 포인트, 비즈 월렛 충전 필수 (최소 30만원~최대 3,000만원).
+        토스 포인트는 무상 지급이라 세금계산서가 발행되지 않습니다. 광고 푸시는 예상 발송 건수로 차감 후 실 발송 기준 재정산.
+      </div>
+      <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.18);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#fca5a5;line-height:1.6;">
+        ⚠ <strong>금지:</strong> 게임 앱의 확률형/랜덤 보상, 게임 결과 기반 보상, 재화 환전형, 현금 보장형/투자성/사행성 캠페인.
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.06);">
+            ${['캠페인명','유형','타겟','기간','예산','사용액','참여','전환율','상태'].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${CAMPAIGNS_LIST.map(c=>{
+              const pct = c.budget>0 ? Math.round(c.used/c.budget*100) : 0;
+              return `<tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#ffffff;">${c.name}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${c.type}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${c.target}</td>
+                <td style="padding:14px 16px;font-size:11px;color:#767d8c;">${c.period}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#ffffff;">₩${c.budget.toLocaleString()}</td>
+                <td style="padding:14px 16px;font-size:12px;">
+                  <div style="font-weight:600;color:#ffcb48;margin-bottom:3px;">₩${c.used.toLocaleString()}</div>
+                  <div style="height:3px;background:#32363c;border-radius:2px;width:100px;"><div style="height:3px;width:${pct}%;background:#ffcb48;border-radius:2px;"></div></div>
+                </td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${c.joins.toLocaleString()}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#34d399;font-weight:600;">${c.conv}</td>
+                <td style="padding:14px 16px;"><span style="background:${sc(c.status)}1a;color:${sc(c.status)};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● ${c.status}</span></td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════
+     비즈 월렛 — 앱인토스: 비즈 월렛 + 인보이스
+  ═══════════════════════════════════════════ */
+  const WALLET_HISTORY = [
+    {date:'2026.05.14 10:22', type:'충전',    desc:'법인카드 충전',                  amount:+5000000, balance:7240000},
+    {date:'2026.05.13 18:00', type:'사용',    desc:'5월 신규 유저 환영 포인트 (캠페인)', amount:-842000,  balance:2240000},
+    {date:'2026.05.10 14:38', type:'사용',    desc:'1,000 VX 구매 시 500P 추가',     amount:-312000,  balance:3082000},
+    {date:'2026.05.01 09:00', type:'충전',    desc:'법인카드 충전',                  amount:+3000000, balance:3394000},
+    {date:'2026.04.30 23:40', type:'정산',    desc:'4월 광고 푸시 차액 환급',         amount:+27600,   balance:394000},
+  ];
+  const INVOICES = [
+    {month:'2026년 4월', issued:'2026.05.01', amount:'₩2,184,400', items:'프로모션 사용분 + 광고 푸시', status:'발행 완료'},
+    {month:'2026년 3월', issued:'2026.04.01', amount:'₩1,872,200', items:'프로모션 사용분',           status:'발행 완료'},
+    {month:'2026년 2월', issued:'2026.03.02', amount:'₩1,420,800', items:'프로모션 사용분',           status:'발행 완료'},
+  ];
+
+  function renderWallet(el) {
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">💼</div>
+        <div>
+          <div class="guide-page-banner-title">비즈 월렛</div>
+          <div class="guide-page-banner-sub">앱인토스 <strong>'비즈 월렛'</strong> 대응. 프로모션·광고 푸시 운영을 위해 미리 충전하는 잔액 + 월별 인보이스를 통합한 페이지입니다.</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">①</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">잔액 카드 + 사용 요약 (좌측)</div>
+          <div class="guide-callout-desc">
+            <strong>충전 한도</strong>: 최소 ₩300,000 ~ 최대 ₩30,000,000. 신용/법인카드만 가능 (앱인토스 정책).
+            <br>"+충전하기"는 결제 위젯, "프로모션으로"는 캠페인 페이지로 바로 이동.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;">
+        <div style="background:linear-gradient(135deg,rgba(17,185,210,0.12),rgba(255,203,72,0.06));border:1px solid rgba(17,185,210,0.3);border-radius:14px;padding:24px;">
+          <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">현재 비즈 월렛 잔액</div>
+          <div style="font-size:36px;font-weight:700;color:#ffffff;margin-bottom:10px;">₩7,240,000</div>
+          <div style="font-size:11px;color:#767d8c;margin-bottom:18px;">충전 한도: 최소 ₩300,000 ~ 최대 ₩30,000,000 · 신용/법인카드만 가능</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-primary" onclick="showToast('💳 충전 페이지로 이동')">+ 충전하기</button>
+            <button class="btn btn-ghost" onclick="navigate('promotions')">🎁 프로모션으로</button>
+          </div>
+        </div>
+        <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:20px;">
+          <div style="font-size:12px;font-weight:600;color:#ffffff;margin-bottom:14px;">5월 사용 요약</div>
+          ${[
+            {label:'토스 포인트 지급', val:'₩1,358,000'},
+            {label:'광고 푸시',         val:'₩482,400'},
+            {label:'정산 환급',         val:'+₩27,600'},
+            {label:'순 사용액',         val:'₩1,812,800', accent:true},
+          ].map(s=>`
+            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(17,185,210,0.06);">
+              <span style="font-size:11px;color:#767d8c;">${s.label}</span>
+              <span style="font-size:11px;font-weight:${s.accent?700:500};color:${s.accent?'#ffcb48':'#ffffff'};">${s.val}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">②</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">거래 내역</div>
+          <div class="guide-callout-desc">충전 / 사용(캠페인) / 정산(광고 푸시 차액 환급 등) 순으로 시계열 표시. 잔액 변화도 함께 표시되어 회계 추적이 쉬움.</div>
+        </div>
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:600;color:#ffffff;">최근 거래 내역</div>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">전체 보기 →</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.04);">
+            ${['일시','구분','내용','금액','잔액'].map(h=>`<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${WALLET_HISTORY.map(h=>{
+              const sign = h.amount>0?'+':'';
+              const color = h.amount>0?'#34d399':'#fb923c';
+              return `<tr style="border-top:1px solid rgba(17,185,210,0.06);">
+                <td style="padding:10px 14px;font-size:12px;color:#94a3b8;">${h.date}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#ffffff;">${h.type}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#94a3b8;">${h.desc}</td>
+                <td style="padding:10px 14px;font-size:12px;font-weight:600;color:${color};">${sign}₩${Math.abs(h.amount).toLocaleString()}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#ffffff;">₩${h.balance.toLocaleString()}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">③</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">인보이스 (앱인토스 룰)</div>
+          <div class="guide-callout-desc">월 단위 정산 기준 인보이스 PDF. <strong>익월 1~2일</strong>에 자동 업데이트 (앱인토스 정책).</div>
+        </div>
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#ffffff;">인보이스</div>
+            <div style="font-size:11px;color:#767d8c;margin-top:3px;">월 단위 정산 기준 정보 · 익월 1~2일 업데이트</div>
+          </div>
+          <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">⬇ 전체 다운로드</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.04);">
+            ${['귀속 월','발행일','금액','내역','상태',''].map(h=>`<th style="padding:10px 14px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${INVOICES.map(i=>`
+              <tr style="border-top:1px solid rgba(17,185,210,0.06);">
+                <td style="padding:10px 14px;font-size:12px;color:#ffffff;font-weight:600;">${i.month}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#94a3b8;">${i.issued}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#ffcb48;font-weight:600;">${i.amount}</td>
+                <td style="padding:10px 14px;font-size:12px;color:#94a3b8;">${i.items}</td>
+                <td style="padding:10px 14px;"><span style="background:rgba(52,211,153,0.12);color:#34d399;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● ${i.status}</span></td>
+                <td style="padding:10px 14px;"><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📄 ${i.month} 인보이스 다운로드')">⬇ PDF</button></td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════
+     멤버 관리 — 앱인토스: 워크스페이스 > 멤버
+  ═══════════════════════════════════════════ */
+  const MEMBERS_LIST = [
+    {name:'Hakyong Tae',     email:'hakyong@planetariumhq.com', role:'관리자',  status:'활성',   joined:'2025.01.15', last:'방금 전'},
+    {name:'Jiwon Park',      email:'jiwon@planetariumhq.com',   role:'구성원',  status:'활성',   joined:'2025.02.20', last:'2시간 전'},
+    {name:'Minjae Kim',      email:'minjae@planetariumhq.com',  role:'구성원',  status:'활성',   joined:'2025.04.12', last:'어제'},
+    {name:'Sojeong Lee',     email:'sojeong@planetariumhq.com', role:'구성원',  status:'초대됨', joined:'2026.05.10', last:'-'},
+  ];
+
+  function renderMembers(el) {
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">👥</div>
+        <div>
+          <div class="guide-page-banner-title">멤버 관리</div>
+          <div class="guide-page-banner-sub">앱인토스 <strong>'나의 워크스페이스 > 멤버'</strong> 대응. 스튜디오 팀원을 초대하고 권한을 설정합니다. <strong>워크스페이스는 사업자당 1개만</strong> 생성 가능합니다.</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">①</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">권한 체계 (앱인토스 룰)</div>
+          <div class="guide-callout-desc">
+            <strong style="color:#ffcb48;">👑 관리자</strong> — 모든 권한. 멤버 초대/제거, 정산·결제 설정 변경 가능. 관리자 본인은 "제거" 액션 불가.
+            <br><strong style="color:#11B9D2;">구성원</strong> — 데이터 조회·운영 가능. 멤버 초대 / 결정적 설정 변경 불가.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;">
+        ${[
+          {label:'총 멤버',  val:MEMBERS_LIST.length, color:'#11B9D2', icon:'👥'},
+          {label:'관리자',   val:MEMBERS_LIST.filter(m=>m.role==='관리자').length, color:'#ffcb48', icon:'👑'},
+          {label:'초대 대기',val:MEMBERS_LIST.filter(m=>m.status==='초대됨').length, color:'#fb923c', icon:'📨'},
+        ].map(c=>`
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:18px 20px;">
+            <div style="font-size:20px;margin-bottom:8px;">${c.icon}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:22px;font-weight:700;color:${c.color};">${c.val}</div>
+          </div>`).join('')}
+      </div>
+
+      <div style="background:rgba(17,185,210,0.05);border:1px solid rgba(17,185,210,0.2);border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:12px;color:#dbe0e9;line-height:1.6;">
+        💡 <strong>권한 안내:</strong>
+        <strong>관리자</strong> — 모든 권한 (멤버 초대·삭제, 정산·결제 설정 변경 가능).
+        <strong>구성원</strong> — 데이터 조회·운영 가능. 멤버 초대 및 결정적 설정 변경 불가.
+        워크스페이스는 사업자당 1개만 생성 가능합니다.
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.06);">
+            ${['이름','이메일','역할','상태','가입일','마지막 활동',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${MEMBERS_LIST.map(m=>{
+              const sc = m.status==='활성'?'#34d399':'#fb923c';
+              const rc = m.role==='관리자'?'#ffcb48':'#11B9D2';
+              return `<tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#ffffff;">${m.name}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${m.email}</td>
+                <td style="padding:14px 16px;"><span style="background:${rc}1a;color:${rc};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">${m.role==='관리자'?'👑 ':''}${m.role}</span></td>
+                <td style="padding:14px 16px;"><span style="background:${sc}1a;color:${sc};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● ${m.status}</span></td>
+                <td style="padding:14px 16px;font-size:12px;color:#767d8c;">${m.joined}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${m.last}</td>
+                <td style="padding:14px 16px;text-align:right;">
+                  ${m.role==='관리자'
+                    ? `<span style="font-size:11px;color:#767d8c;">—</span>`
+                    : `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;margin-right:4px;" onclick="showToast('🔁 ${m.name} 역할 변경')">역할</button>
+                       <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;color:#f87171;border-color:rgba(248,113,113,0.3);" onclick="showToast('🗑 ${m.name} 제거')">제거</button>`}
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
+  /* ═══════════════════════════════════════════
+     결제 알림 URL (Webhook) — 앱인토스: 결제 알림 URL 등록
+  ═══════════════════════════════════════════ */
+  const WEBHOOKS_LIST = [
+    {name:'Production 결제 이벤트', url:'https://api.planetariumhq.com/v8/payment/webhook', events:['payment.completed','subscription.renewed','subscription.cancelled','refund.processed'], status:'활성',   lastDelivery:'2분 전',  success:'99.8%'},
+    {name:'Staging Webhook',        url:'https://staging-api.planetariumhq.com/v8/payment/webhook', events:['payment.completed','refund.processed'], status:'활성',   lastDelivery:'18분 전', success:'97.2%'},
+    {name:'Legacy (deprecated)',    url:'https://legacy.planetariumhq.com/hooks/toss',     events:['payment.completed'], status:'비활성', lastDelivery:'7일 전',  success:'82.4%'},
+  ];
+
+  function renderWebhooks(el) {
+    el.innerHTML = `
+      <div class="guide-page-banner">
+        <div class="guide-page-banner-icon">🔔</div>
+        <div>
+          <div class="guide-page-banner-title">결제 알림 URL (Webhook)</div>
+          <div class="guide-page-banner-sub">앱인토스 <strong>'결제 알림 URL 등록'</strong> 대응. 결제 상태가 변경될 때 파트너 서버로 HTTP 호출을 보내는 Webhook 설정.</div>
+        </div>
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">①</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">Webhook 동작 방식</div>
+          <div class="guide-callout-desc">
+            결제 완료·구독 갱신·환불 등 이벤트 발생 시 등록 URL로 <strong>HTTP POST</strong> 발송.
+            응답 <strong>5xx 또는 타임아웃</strong> 시 지수 백오프로 <strong>최대 5회 재시도</strong>.
+            서버 측 결제 검증 / 인벤토리 지급 자동화 / CS 자동화에 사용.
+          </div>
+        </div>
+      </div>
+
+      <div style="background:rgba(17,185,210,0.05);border:1px solid rgba(17,185,210,0.2);border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:12px;color:#dbe0e9;line-height:1.6;">
+        💡 <strong>결제 알림 URL이란?</strong> 구독 갱신·해지, 결제 완료, 환불 처리 등 결제 상태가 변경될 때 등록된 URL로 HTTP POST 요청이 발송됩니다.
+        서버 측 결제 검증 / 인벤토리 지급 / CS 자동화에 사용합니다. 응답 5xx 또는 타임아웃 시 지수 백오프로 최대 5회 재시도.
+      </div>
+
+      <div class="guide-callout">
+        <div class="guide-callout-num">②</div>
+        <div class="guide-callout-body">
+          <div class="guide-callout-title">지원 이벤트 타입 6종</div>
+          <div class="guide-callout-desc">각 이벤트는 독립적으로 구독 가능. 운영용 / 스테이징용 URL을 분리해서 등록할 수 있고, 비활성 처리 시 발송 중단.</div>
+        </div>
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;margin-bottom:20px;">
+        <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:14px;">지원 이벤트 타입</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+          ${[
+            {evt:'payment.completed',      desc:'결제 완료 (상품 지급 시점)'},
+            {evt:'payment.failed',         desc:'결제 실패'},
+            {evt:'subscription.renewed',   desc:'구독 자동 갱신 성공'},
+            {evt:'subscription.cancelled', desc:'구독 해지'},
+            {evt:'refund.processed',       desc:'환불 처리 완료'},
+            {evt:'refund.rejected',        desc:'환불 반려'},
+          ].map(e=>`
+            <div style="background:#0f0f1e;border:1px solid rgba(17,185,210,0.1);border-radius:8px;padding:10px 14px;">
+              <div style="font-family:monospace;font-size:12px;color:#ffcb48;margin-bottom:3px;">${e.evt}</div>
+              <div style="font-size:11px;color:#767d8c;">${e.desc}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="background:rgba(17,185,210,0.06);">
+            ${['이름','URL','구독 이벤트','상태','마지막 발송','성공률',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+          </tr></thead>
+          <tbody>
+            ${WEBHOOKS_LIST.map(w=>{
+              const sc = w.status==='활성'?'#34d399':'#767d8c';
+              return `<tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#ffffff;">${w.name}</td>
+                <td style="padding:14px 16px;font-family:monospace;font-size:11px;color:#94a3b8;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${w.url}</td>
+                <td style="padding:14px 16px;">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px;max-width:240px;">
+                    ${w.events.map(e=>`<span style="background:rgba(17,185,210,0.1);color:#11B9D2;border-radius:4px;padding:2px 6px;font-family:monospace;font-size:10px;">${e}</span>`).join('')}
+                  </div>
+                </td>
+                <td style="padding:14px 16px;"><span style="background:${sc}1a;color:${sc};border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● ${w.status}</span></td>
+                <td style="padding:14px 16px;font-size:12px;color:#94a3b8;">${w.lastDelivery}</td>
+                <td style="padding:14px 16px;font-size:12px;font-weight:600;color:${parseFloat(w.success)>95?'#34d399':parseFloat(w.success)>85?'#ffcb48':'#f87171'};">${w.success}</td>
+                <td style="padding:14px 16px;text-align:right;">
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;margin-right:4px;" onclick="showToast('📋 ${w.name} 로그')">로그</button>
+                  <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🧪 ${w.name} 테스트 발송')">테스트</button>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  }
+
   function renderAccountSettings(el) {
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -3234,6 +3996,12 @@
     dashboard:       renderDashboard,
     games:           renderGames,
     'game-detail':   renderGameDetail,
+    products:        renderProducts,
+    refunds:         renderRefunds,
+    promotions:      renderPromotions,
+    wallet:          renderWallet,
+    members:         renderMembers,
+    webhooks:        renderWebhooks,
     ads:             renderAds,
     tax:             renderTax,
     users:           renderUsers,
@@ -3256,7 +4024,7 @@
 </html>
 <script>
 /* i18n */
-const T={ko:{'nav.dashboard':'한눈에 보기','nav.games':'게임 관리','nav.payments':'결제 내역','nav.ads':'광고 수익','nav.settlement':'정산 관리','nav.tax':'세금계산서','nav.analytics':'매출 분석','nav.users':'유저 분석','nav.abtest':'A/B 테스트','nav.accountSettings':'계좌 설정','nav.profile':'프로필 설정','nav.group.overview':'개요','nav.group.monetize':'수익화','nav.group.analytics':'분석','nav.group.settings':'설정','lang.label':'언어','lang.desc':'인터페이스 언어를 선택합니다. 설정은 이 브라우저에 저장됩니다.','lang.ko':'한국어','lang.en':'English','lang.saved':'언어가 변경되었습니다.'},en:{'nav.dashboard':'Overview','nav.games':'Games','nav.payments':'Payments','nav.ads':'Ad Revenue','nav.settlement':'Settlements','nav.tax':'Tax Docs','nav.analytics':'Revenue Analytics','nav.users':'User Analytics','nav.abtest':'A/B Tests','nav.accountSettings':'Account Settings','nav.profile':'Profile','nav.group.overview':'Overview','nav.group.monetize':'Monetization','nav.group.analytics':'Analytics','nav.group.settings':'Settings','lang.label':'Language','lang.desc':'Select the interface language. The setting is saved in this browser.','lang.ko':'한국어','lang.en':'English','lang.saved':'Language updated.'}};
+const T={ko:{'nav.dashboard':'한눈에 보기','nav.games':'게임 관리','nav.products':'상품 관리','nav.payments':'결제 내역','nav.refunds':'환불 관리','nav.ads':'광고 수익','nav.promotions':'프로모션','nav.settlement':'정산 관리','nav.wallet':'비즈 월렛','nav.tax':'세금계산서','nav.analytics':'매출 분석','nav.users':'유저 분석','nav.abtest':'A/B 테스트','nav.members':'멤버 관리','nav.webhooks':'결제 알림 URL','nav.accountSettings':'계좌 설정','nav.profile':'프로필 설정','nav.group.overview':'개요','nav.group.monetize':'수익화','nav.group.analytics':'분석','nav.group.settings':'설정','lang.label':'언어','lang.desc':'인터페이스 언어를 선택합니다. 설정은 이 브라우저에 저장됩니다.','lang.ko':'한국어','lang.en':'English','lang.saved':'언어가 변경되었습니다.'},en:{'nav.dashboard':'Overview','nav.games':'Games','nav.products':'Products (IAP)','nav.payments':'Payments','nav.refunds':'Refunds','nav.ads':'Ad Revenue','nav.promotions':'Promotions','nav.settlement':'Settlements','nav.wallet':'Biz Wallet','nav.tax':'Tax Docs','nav.analytics':'Revenue Analytics','nav.users':'User Analytics','nav.abtest':'A/B Tests','nav.members':'Members','nav.webhooks':'Payment Webhooks','nav.accountSettings':'Account Settings','nav.profile':'Profile','nav.group.overview':'Overview','nav.group.monetize':'Monetization','nav.group.analytics':'Analytics','nav.group.settings':'Settings','lang.label':'Language','lang.desc':'Select the interface language. The setting is saved in this browser.','lang.ko':'한국어','lang.en':'English','lang.saved':'Language updated.'}};
 let currentLang=localStorage.getItem('v8_lang')||'ko';
 function t(k){return(T[currentLang]&&T[currentLang][k])||T.ko[k]||k;}
 function applyLang(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.getAttribute('data-i18n'));});document.querySelectorAll('.lang-option').forEach(el=>{el.classList.toggle('active',el.dataset.lang===currentLang);});}
