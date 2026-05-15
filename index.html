@@ -201,6 +201,13 @@
     .user-info { min-width: 0; }
     .user-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
     .user-role { font-size: 11px; color: var(--text-muted); }
+    .sidebar-lang {
+      display: flex; gap: 6px; margin-top: 10px;
+    }
+    .sidebar-lang .lang-option {
+      flex: 1; padding: 5px 0; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.03em;
+    }
 
     /* ─── MAIN ─── */
     .main {
@@ -915,6 +922,10 @@
           <div class="user-name">Planet Studio</div>
           <div class="user-role">관리자 · hakyong@planetariumhq.com</div>
         </div>
+      </div>
+      <div class="sidebar-lang">
+        <button class="lang-option" data-lang="ko" onclick="setLang('ko')">KO</button>
+        <button class="lang-option" data-lang="en" onclick="setLang('en')">EN</button>
       </div>
     </div>
   </aside>
