@@ -5,51 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verse8 — 정산 관리</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     /* ═══════════════════════════════════════════
        VERSE8 DESIGN TOKENS
     ═══════════════════════════════════════════ */
     :root {
-      --bg-base:       #07070f;
-      --bg-surface:    #0f0f1c;
-      --bg-card:       #13132200;
-      --bg-card-solid: #131322;
-      --bg-hover:      #1c1c32;
-      --bg-input:      #0f0f1e;
+      /* Verse8 Design System — Gray base */
+      --bg-base:       #111315;
+      --bg-surface:    #17191c;
+      --bg-card:       #22242800;
+      --bg-card-solid: #222428;
+      --bg-hover:      #32363c;
+      --bg-input:      #111315;
 
-      --border:        rgba(139, 92, 246, 0.15);
-      --border-strong: rgba(139, 92, 246, 0.35);
+      /* Borders — opacity based (Verse8 standard) */
+      --border:        rgba(255, 255, 255, 0.12);
+      --border-strong: rgba(255, 255, 255, 0.35);
 
-      --purple-500:    #8b5cf6;
-      --purple-400:    #a78bfa;
-      --purple-600:    #7c3aed;
-      --cyan-400:      #22d3ee;
-      --cyan-500:      #06b6d4;
-      --green-400:     #34d399;
-      --green-500:     #10b981;
-      --red-400:       #f87171;
-      --orange-400:    #fb923c;
-      --yellow-400:    #fbbf24;
+      /* Brand: Cyan primary, Yellow secondary */
+      --purple-500:    #1a92a4;   /* → Verse8 cyan-500 (primary brand) */
+      --purple-400:    #11B9D2;   /* → Verse8 cyan-400 */
+      --purple-600:    #1a7583;   /* → Verse8 cyan-600 */
+      --cyan-400:      #ffcb48;   /* → Verse8 yellow-400 (secondary brand) */
+      --cyan-500:      #ffbe18;   /* → Verse8 yellow-500 */
 
-      --grad-primary:  linear-gradient(135deg, #8b5cf6 0%, #22d3ee 100%);
-      --grad-card:     linear-gradient(135deg, rgba(139,92,246,0.08) 0%, rgba(34,211,238,0.05) 100%);
-      --grad-purple:   linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-      --grad-text:     linear-gradient(90deg, #a78bfa 0%, #22d3ee 100%);
+      /* Status colors */
+      --green-400:     #32d583;
+      --green-500:     #12b76a;
+      --red-400:       #f97066;
+      --orange-400:    #fdb022;
+      --yellow-400:    #ffcb48;
 
-      --text-primary:  #f1f0ff;
-      --text-secondary:#94a3b8;
-      --text-muted:    #4b5563;
-      --text-disabled: #374151;
+      /* Gradients — Verse8 brand */
+      --grad-primary:  linear-gradient(90deg, #1a92a4 0%, #11B9D2 100%);
+      --grad-card:     linear-gradient(135deg, rgba(17,185,210,0.08) 0%, rgba(255,203,72,0.05) 100%);
+      --grad-purple:   linear-gradient(135deg, #1a7583 0%, #1a92a4 100%);
+      --grad-text:     linear-gradient(90deg, #11B9D2 0%, #ffcb48 100%);
+
+      /* Text */
+      --text-primary:   #ffffff;
+      --text-secondary: #dbe0e9;
+      --text-muted:     #767d8c;
+      --text-disabled:  #464c54;
 
       --radius-sm:  6px;
       --radius-md:  10px;
       --radius-lg:  14px;
       --radius-xl:  20px;
 
-      --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(139,92,246,0.08);
-      --shadow-glow: 0 0 24px rgba(139,92,246,0.25);
+      --shadow-card: 0 4px 24px rgba(0,0,0,0.4), 0 1px 4px rgba(17,185,210,0.08);
+      --shadow-glow: 0 0 24px rgba(17,185,210,0.25);
 
       --sidebar-w: 240px;
     }
@@ -57,7 +65,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      font-family: 'Inter', -apple-system, sans-serif;
+      font-family: 'Instrument Sans', -apple-system, sans-serif;
       background: var(--bg-base);
       color: var(--text-primary);
       height: 100%;
@@ -67,7 +75,7 @@
     /* ─── SCROLLBAR ─── */
     ::-webkit-scrollbar { width: 4px; height: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 2px; }
+    ::-webkit-scrollbar-thumb { background: rgba(17,185,210,0.3); border-radius: 2px; }
 
     /* ═══════════════════════════════════════════
        LAYOUT
@@ -110,8 +118,8 @@
       margin-left: auto;
       font-size: 9px; font-weight: 600;
       padding: 2px 6px;
-      background: rgba(139,92,246,0.2);
-      border: 1px solid rgba(139,92,246,0.35);
+      background: rgba(17,185,210,0.2);
+      border: 1px solid rgba(255,255,255,0.35);
       border-radius: 4px;
       color: var(--purple-400);
       letter-spacing: 0.5px;
@@ -160,17 +168,17 @@
     }
     .nav-item:hover {
       color: var(--text-primary);
-      background: rgba(139,92,246,0.06);
+      background: rgba(17,185,210,0.06);
     }
     .nav-item.active {
       color: var(--purple-400);
-      background: rgba(139,92,246,0.1);
+      background: rgba(17,185,210,0.1);
       border-left-color: var(--purple-500);
     }
     .nav-icon { font-size: 15px; width: 18px; text-align: center; }
     .nav-badge {
       margin-left: auto;
-      background: rgba(139,92,246,0.25);
+      background: rgba(17,185,210,0.25);
       color: var(--purple-400);
       font-size: 10px; font-weight: 600;
       padding: 1px 6px; border-radius: 10px;
@@ -240,10 +248,10 @@
     .btn-primary {
       background: var(--grad-purple);
       color: white;
-      box-shadow: 0 2px 12px rgba(139,92,246,0.35);
+      box-shadow: 0 2px 12px rgba(255,255,255,0.35);
     }
     .btn-primary:hover {
-      box-shadow: 0 4px 20px rgba(139,92,246,0.5);
+      box-shadow: 0 4px 20px rgba(17,185,210,0.5);
       transform: translateY(-1px);
     }
     .btn-ghost {
@@ -273,7 +281,7 @@
       transition: all 0.15s;
     }
     .tab-item.active {
-      background: rgba(139,92,246,0.2);
+      background: rgba(17,185,210,0.2);
       color: var(--purple-400);
     }
     .tab-item:hover:not(.active) { color: var(--text-secondary); }
@@ -329,7 +337,7 @@
       transition: all 0.12s;
     }
     .date-pill.active {
-      background: rgba(139,92,246,0.2);
+      background: rgba(17,185,210,0.2);
       border-color: var(--border-strong);
       color: var(--purple-400);
     }
@@ -347,7 +355,7 @@
       border-radius: var(--radius-sm);
       padding: 5px 10px;
       font-size: 12px; color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Instrument Sans', sans-serif;
       outline: none;
     }
     .date-input:focus { border-color: var(--border-strong); }
@@ -385,8 +393,8 @@
     .stat-card:hover::before { opacity: 1; }
 
     .stat-card.highlight {
-      background: linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(34,211,238,0.05) 100%);
-      border-color: rgba(139,92,246,0.3);
+      background: linear-gradient(135deg, rgba(17,185,210,0.1) 0%, rgba(255,203,72,0.05) 100%);
+      border-color: rgba(17,185,210,0.3);
     }
     .stat-card.highlight::before { opacity: 1; }
 
@@ -404,8 +412,8 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 16px;
     }
-    .stat-icon.purple { background: rgba(139,92,246,0.15); }
-    .stat-icon.cyan   { background: rgba(34,211,238,0.12); }
+    .stat-icon.purple { background: rgba(17,185,210,0.15); }
+    .stat-icon.cyan   { background: rgba(255,203,72,0.12); }
     .stat-icon.green  { background: rgba(52,211,153,0.12); }
     .stat-icon.orange { background: rgba(251,146,60,0.12); }
 
@@ -498,11 +506,11 @@
       position: relative;
     }
     .schedule-dot.done { background: var(--green-400); box-shadow: 0 0 6px rgba(52,211,153,0.5); }
-    .schedule-dot.pending { background: var(--purple-500); box-shadow: 0 0 6px rgba(139,92,246,0.5); }
+    .schedule-dot.pending { background: var(--purple-500); box-shadow: 0 0 6px rgba(17,185,210,0.5); }
     .schedule-dot.upcoming { background: var(--text-muted); }
     .schedule-dot.next {
       background: var(--cyan-400);
-      box-shadow: 0 0 8px rgba(34,211,238,0.6);
+      box-shadow: 0 0 8px rgba(17,185,210,0.6);
     }
     .schedule-line {
       width: 1px; flex: 1; min-height: 20px;
@@ -535,7 +543,7 @@
       color: var(--green-400);
     }
     .schedule-status.pending {
-      background: rgba(139,92,246,0.15);
+      background: rgba(17,185,210,0.15);
       color: var(--purple-400);
     }
     .schedule-status.upcoming {
@@ -543,7 +551,7 @@
       color: var(--text-muted);
     }
     .schedule-status.next {
-      background: rgba(34,211,238,0.12);
+      background: rgba(255,203,72,0.12);
       color: var(--cyan-400);
     }
 
@@ -580,7 +588,7 @@
       background: transparent; border: none;
       transition: all 0.12s;
     }
-    .copy-btn:hover { color: var(--purple-400); background: rgba(139,92,246,0.1); }
+    .copy-btn:hover { color: var(--purple-400); background: rgba(17,185,210,0.1); }
 
     /* ─── POLICY SUMMARY ─── */
     .policy-row {
@@ -613,7 +621,7 @@
     .search-input {
       background: transparent; border: none; outline: none;
       font-size: 12px; color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Instrument Sans', sans-serif;
       width: 100%;
     }
     .search-input::placeholder { color: var(--text-muted); }
@@ -624,7 +632,7 @@
       border-radius: var(--radius-sm);
       padding: 6px 10px;
       font-size: 12px; color: var(--text-secondary);
-      font-family: 'Inter', sans-serif;
+      font-family: 'Instrument Sans', sans-serif;
       outline: none;
       cursor: pointer;
     }
@@ -657,11 +665,11 @@
     th.right, td.right { text-align: right; }
     th.center, td.center { text-align: center; }
     tbody tr {
-      border-bottom: 1px solid rgba(139,92,246,0.06);
+      border-bottom: 1px solid rgba(17,185,210,0.06);
       transition: background 0.12s;
     }
     tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(139,92,246,0.04); }
+    tbody tr:hover { background: rgba(17,185,210,0.04); }
     td {
       padding: 13px 16px;
       font-size: 13px; color: var(--text-secondary);
@@ -694,11 +702,11 @@
     }
     .status-badge.done::before { background: var(--green-400); }
     .status-badge.pending {
-      background: rgba(139,92,246,0.1);
-      border: 1px solid rgba(139,92,246,0.25);
+      background: rgba(17,185,210,0.1);
+      border: 1px solid rgba(17,185,210,0.25);
       color: var(--purple-400);
     }
-    .status-badge.pending::before { background: var(--purple-500); box-shadow: 0 0 4px rgba(139,92,246,0.8); }
+    .status-badge.pending::before { background: var(--purple-500); box-shadow: 0 0 4px rgba(17,185,210,0.8); }
     .status-badge.processing {
       background: rgba(251,146,60,0.1);
       border: 1px solid rgba(251,146,60,0.2);
@@ -733,7 +741,7 @@
     }
     .page-btn:hover { border-color: var(--border-strong); color: var(--text-primary); }
     .page-btn.active {
-      background: rgba(139,92,246,0.2);
+      background: rgba(17,185,210,0.2);
       border-color: var(--border-strong);
       color: var(--purple-400);
     }
@@ -741,8 +749,8 @@
     /* ─── NOTICE BANNER ─── */
     .notice-banner {
       display: flex; align-items: flex-start; gap: 10px;
-      background: rgba(34,211,238,0.06);
-      border: 1px solid rgba(34,211,238,0.2);
+      background: rgba(17,185,210,0.06);
+      border: 1px solid rgba(255,203,72,0.2);
       border-radius: var(--radius-md);
       padding: 12px 16px;
       margin-bottom: 20px;
@@ -1306,18 +1314,18 @@
             </div>
             <div class="card-body">
               <!-- VX 흐름 설명 박스 -->
-              <div style="background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(34,211,238,0.05));border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:16px;">
+              <div style="background:linear-gradient(135deg,rgba(17,185,210,0.08),rgba(255,203,72,0.05));border:1px solid var(--border-strong);border-radius:var(--radius-md);padding:16px 18px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                   <span style="font-size:16px;">🪙</span>
                   <span style="font-size:13px;font-weight:600;color:var(--text-primary);">VX — Verse8 전용 가상화폐</span>
                 </div>
                 <div style="display:flex;gap:0;align-items:center;margin-bottom:12px;font-size:12px;">
-                  <div style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
+                  <div style="background:rgba(17,185,210,0.15);border:1px solid rgba(17,185,210,0.3);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
                     <div style="color:var(--purple-400);font-weight:600;margin-bottom:2px;">유저</div>
                     <div style="color:var(--text-muted);">현금으로 VX 충전</div>
                   </div>
                   <div style="color:var(--text-muted);padding:0 8px;font-size:18px;">→</div>
-                  <div style="background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
+                  <div style="background:rgba(255,203,72,0.1);border:1px solid rgba(17,185,210,0.25);border-radius:8px;padding:8px 12px;text-align:center;flex:1;">
                     <div style="color:var(--cyan-400);font-weight:600;margin-bottom:2px;">플랫폼</div>
                     <div style="color:var(--text-muted);">VX로 콘텐츠 구매</div>
                   </div>
@@ -1387,7 +1395,7 @@
                   </div>
                 </div>
                 <div style="display:flex;gap:10px;align-items:flex-start;">
-                  <span style="background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.25);color:var(--purple-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">조건부</span>
+                  <span style="background:rgba(17,185,210,0.15);border:1px solid rgba(17,185,210,0.25);color:var(--purple-400);font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;flex-shrink:0;">조건부</span>
                   <div>
                     <div style="font-size:13px;font-weight:500;color:var(--text-primary);">첫 출금 최소 금액 충족</div>
                     <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">첫 출금은 $100 이상이어야 하며, 미달 시 익월 자동 이월</div>
@@ -1478,7 +1486,7 @@
 
     <!-- ══════════ PAGE: 매출 분석 (canvas) ══════════ -->
     <div id="page-analytics" style="display:none;">
-      <div style="margin-bottom:20px;"><div style="font-size:18px;font-weight:700;color:#f1f0ff;">매출 분석</div><div style="font-size:12px;color:#4b5563;margin-top:3px;">상세 매출 및 수익 분석</div></div>
+      <div style="margin-bottom:20px;"><div style="font-size:18px;font-weight:700;color:#ffffff;">매출 분석</div><div style="font-size:12px;color:#767d8c;margin-top:3px;">상세 매출 및 수익 분석</div></div>
       <div class="stats-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px;">
         <div class="stat-card highlight"><div class="stat-header"><span class="stat-label">월 매출 성장률</span><div class="stat-icon purple">📈</div></div><div class="stat-value gradient">+23%</div><div class="stat-meta"><span>전년 동기 대비</span></div></div>
         <div class="stat-card"><div class="stat-header"><span class="stat-label">결제 전환율</span><div class="stat-icon cyan">🎯</div></div><div class="stat-value">3.4%</div><div class="stat-meta"><span class="stat-change up">↑ 0.3%p</span></div></div>
@@ -1504,16 +1512,16 @@
      ║  MODAL: 정산 상세                         ║
      ╚══════════════════════════════════════════╝ -->
 <div id="detailModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
-  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:space-between;">
+  <div style="background:#222428;border:1px solid rgba(255,255,255,0.35);border-radius:16px;width:520px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(17,185,210,0.15);display:flex;align-items:center;justify-content:space-between;">
       <div>
-        <div style="font-size:15px;font-weight:700;color:#f1f0ff;" id="detailTitle">정산 상세</div>
-        <div style="font-size:11px;color:#4b5563;margin-top:2px;" id="detailId">STL-2026042001</div>
+        <div style="font-size:15px;font-weight:700;color:#ffffff;" id="detailTitle">정산 상세</div>
+        <div style="font-size:11px;color:#767d8c;margin-top:2px;" id="detailId">STL-2026042001</div>
       </div>
       <button onclick="closeModal('detailModal')" style="background:rgba(148,163,184,0.1);border:none;color:#94a3b8;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <div style="padding:20px 24px;" id="detailBody"></div>
-    <div style="padding:12px 24px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid rgba(139,92,246,0.1);">
+    <div style="padding:12px 24px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid rgba(17,185,210,0.1);">
       <button onclick="closeModal('detailModal')" class="btn btn-ghost">닫기</button>
       <button onclick="downloadDetailCSV()" class="btn btn-primary">⬇ 이 건 다운로드</button>
     </div>
@@ -1524,28 +1532,28 @@
      ║  MODAL: 정산 신청 확인                    ║
      ╚══════════════════════════════════════════╝ -->
 <div id="settleModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
-  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+  <div style="background:#222428;border:1px solid rgba(255,255,255,0.35);border-radius:16px;width:420px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
     <div style="padding:28px 24px 0;text-align:center;">
-      <div style="width:52px;height:52px;background:linear-gradient(135deg,#7c3aed,#22d3ee);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:22px;">🏦</div>
-      <div style="font-size:17px;font-weight:700;color:#f1f0ff;margin-bottom:6px;">정산을 신청하시겠습니까?</div>
+      <div style="width:52px;height:52px;background:linear-gradient(135deg,#1a7583,#ffcb48);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:22px;">🏦</div>
+      <div style="font-size:17px;font-weight:700;color:#ffffff;margin-bottom:6px;">정산을 신청하시겠습니까?</div>
       <div style="font-size:12px;color:#94a3b8;line-height:1.7;margin-bottom:20px;">
-        출금 가능 잔액 <strong style="color:#22d3ee">$742.10</strong>을 신청합니다.<br>
-        정산 내역은 <strong style="color:#a78bfa">익월 5일 이내</strong> 확인 가능하며,<br>
-        지급은 <strong style="color:#a78bfa">익월 말 영업일</strong>에 이루어집니다.
+        출금 가능 잔액 <strong style="color:#ffcb48">$742.10</strong>을 신청합니다.<br>
+        정산 내역은 <strong style="color:#11B9D2">익월 5일 이내</strong> 확인 가능하며,<br>
+        지급은 <strong style="color:#11B9D2">익월 말 영업일</strong>에 이루어집니다.
       </div>
     </div>
-    <div style="margin:0 24px 20px;background:#1c1c32;border:1px solid rgba(139,92,246,0.2);border-radius:10px;padding:14px 16px;">
+    <div style="margin:0 24px 20px;background:#32363c;border:1px solid rgba(17,185,210,0.2);border-radius:10px;padding:14px 16px;">
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
-        <span style="color:#4b5563">정산 계좌</span>
-        <span style="color:#f1f0ff;font-weight:500;">카카오뱅크 3333-••••-••••</span>
+        <span style="color:#767d8c">정산 계좌</span>
+        <span style="color:#ffffff;font-weight:500;">카카오뱅크 3333-••••-••••</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
-        <span style="color:#4b5563">신청 금액</span>
+        <span style="color:#767d8c">신청 금액</span>
         <span style="color:#34d399;font-weight:700;">$742.10</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:5px 0;font-size:12px;">
-        <span style="color:#4b5563">지급 예정일</span>
-        <span style="color:#f1f0ff;">2026. 06. 30 (말 영업일)</span>
+        <span style="color:#767d8c">지급 예정일</span>
+        <span style="color:#ffffff;">2026. 06. 30 (말 영업일)</span>
       </div>
     </div>
     <div style="padding:0 24px 24px;display:flex;gap:8px;">
@@ -1559,9 +1567,9 @@
      ║  MODAL: 계좌 수정                         ║
      ╚══════════════════════════════════════════╝ -->
 <div id="accountModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
-  <div style="background:#13132e;border:1px solid rgba(139,92,246,0.35);border-radius:16px;width:440px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
-    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(139,92,246,0.15);display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:15px;font-weight:700;color:#f1f0ff;">정산 계좌 수정</div>
+  <div style="background:#222428;border:1px solid rgba(255,255,255,0.35);border-radius:16px;width:440px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.6);">
+    <div style="padding:20px 24px 16px;border-bottom:1px solid rgba(17,185,210,0.15);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:15px;font-weight:700;color:#ffffff;">정산 계좌 수정</div>
       <button onclick="closeModal('accountModal')" style="background:rgba(148,163,184,0.1);border:none;color:#94a3b8;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     <div style="padding:20px 24px;">
@@ -1695,14 +1703,14 @@
     const tbody = document.getElementById('paymentsTbody');
     if (!tbody) return;
     if (pageRows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#4b5563;">결과 없음</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:#767d8c;">결과 없음</td></tr>`;
     } else {
       tbody.innerHTML = pageRows.map(r => `<tr>
         <td class="mono" style="font-size:11px;">${r.id}</td>
-        <td class="mono" style="font-size:11px;color:#4b5563;">${r.user}</td>
-        <td style="font-weight:500;color:#f1f0ff;">${r.pkg}</td>
-        <td class="right" style="font-weight:700;color:#22d3ee;">${(r.vx + r.bonus).toLocaleString()} VX${r.bonus>0?` <span style="font-size:10px;color:#34d399;">(+${r.bonus} 보너스)</span>`:''}</td>
-        <td style="font-size:12px;color:#4b5563;">${r.date}</td>
+        <td class="mono" style="font-size:11px;color:#767d8c;">${r.user}</td>
+        <td style="font-weight:500;color:#ffffff;">${r.pkg}</td>
+        <td class="right" style="font-weight:700;color:#ffcb48;">${(r.vx + r.bonus).toLocaleString()} VX${r.bonus>0?` <span style="font-size:10px;color:#34d399;">(+${r.bonus} 보너스)</span>`:''}</td>
+        <td style="font-size:12px;color:#767d8c;">${r.date}</td>
         <td class="center"><span class="status-badge ${statusClass[r.status]}">${statusLabel[r.status]}</span></td>
         <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🧾 ${r.id} 상세')">상세</button></td>
       </tr>`).join('');
@@ -1755,14 +1763,14 @@
     const tbody = document.getElementById('useTbody');
     if (!tbody) return;
     tbody.innerHTML = pageRows.length === 0
-      ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:#4b5563;">결과 없음</td></tr>`
+      ? `<tr><td colspan="7" style="text-align:center;padding:40px;color:#767d8c;">결과 없음</td></tr>`
       : pageRows.map(r => `<tr>
           <td class="mono" style="font-size:11px;">${r.id}</td>
-          <td class="mono" style="font-size:11px;color:#4b5563;">${r.user}</td>
-          <td style="font-weight:500;color:#f1f0ff;">${r.game}</td>
+          <td class="mono" style="font-size:11px;color:#767d8c;">${r.user}</td>
+          <td style="font-weight:500;color:#ffffff;">${r.game}</td>
           <td style="color:#94a3b8;">${r.item}</td>
-          <td style="font-size:12px;color:#4b5563;">${r.date}</td>
-          <td class="right" style="font-weight:700;color:#a78bfa;">${r.vx.toLocaleString()} VX</td>
+          <td style="font-size:12px;color:#767d8c;">${r.date}</td>
+          <td class="right" style="font-weight:700;color:#11B9D2;">${r.vx.toLocaleString()} VX</td>
           <td class="center"><span class="status-badge ${statusClass[r.status]}">${statusLabel[r.status]}</span></td>
         </tr>`).join('');
     const uc = document.getElementById('use-count');
@@ -1840,17 +1848,17 @@
       data: {
         labels: ['12월','1월','2월','3월','4월','5월'],
         datasets: [
-          { label:'총 수익', data:[3260,3590,4130,4910,5970,null], borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,0.1)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#8b5cf6', pointRadius:4 },
-          { label:'정산액', data:[2608,2872,3304,3928,4776,null], borderColor:'#22d3ee', backgroundColor:'rgba(34,211,238,0.06)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#22d3ee', pointRadius:4 },
+          { label:'총 수익', data:[3260,3590,4130,4910,5970,null], borderColor:'#1a92a4', backgroundColor:'rgba(17,185,210,0.1)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#1a92a4', pointRadius:4 },
+          { label:'정산액', data:[2608,2872,3304,3928,4776,null], borderColor:'#ffcb48', backgroundColor:'rgba(17,185,210,0.06)', borderWidth:2, tension:0.4, fill:true, pointBackgroundColor:'#ffcb48', pointRadius:4 },
         ]
       },
       options: {
         responsive:true, maintainAspectRatio:false,
         interaction:{mode:'index',intersect:false},
-        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(13,13,20,0.95)', borderColor:'rgba(139,92,246,0.3)', borderWidth:1, titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12, callbacks:{ label: c => `  ${c.dataset.label}: $${c.parsed.y}` } } },
+        plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'rgba(13,13,20,0.95)', borderColor:'rgba(17,185,210,0.3)', borderWidth:1, titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12, callbacks:{ label: c => `  ${c.dataset.label}: $${c.parsed.y}` } } },
         scales:{
-          x:{ grid:{display:false}, ticks:{color:'#4b5563',font:{size:11}}, border:{color:'rgba(139,92,246,0.1)'} },
-          y:{ grid:{color:'rgba(139,92,246,0.07)'}, ticks:{color:'#4b5563',font:{size:11},callback:v=>'$'+v}, border:{display:false} }
+          x:{ grid:{display:false}, ticks:{color:'#767d8c',font:{size:11}}, border:{color:'rgba(17,185,210,0.1)'} },
+          y:{ grid:{color:'rgba(17,185,210,0.07)'}, ticks:{color:'#767d8c',font:{size:11},callback:v=>'$'+v}, border:{display:false} }
         }
       }
     });
@@ -1860,7 +1868,7 @@
      TOGGLE SWITCH
   ═══════════════════════════════════════════ */
   function toggleSwitch(el) {
-    const isOn = el.style.background.includes('8b5cf6') || el.style.background.includes('var(--purple');
+    const isOn = el.style.background.includes('1a92a4') || el.style.background.includes('var(--purple');
     el.style.background = isOn ? 'rgba(75,85,99,0.5)' : 'var(--purple-500)';
     const dot = el.querySelector('div');
     if (isOn) { dot.style.right='auto'; dot.style.left='3px'; }
@@ -1917,13 +1925,13 @@
   /* ═══════════════════════════════════════════
      TOAST
   ═══════════════════════════════════════════ */
-  function showToast(html, color='#1c1c32') {
+  function showToast(html, color='#32363c') {
     const t = document.createElement('div');
     t.innerHTML = html;
     Object.assign(t.style, {
       position:'fixed', bottom:'24px', right:'24px',
       background: color,
-      border:'1px solid rgba(139,92,246,0.4)',
+      border:'1px solid rgba(17,185,210,0.4)',
       color:'#f1f0ff', padding:'13px 20px', borderRadius:'10px',
       fontSize:'13px', fontWeight:'500', zIndex:'9999',
       boxShadow:'0 4px 24px rgba(0,0,0,0.5)',
@@ -2023,16 +2031,16 @@
     const tbody = document.getElementById('settlementTbody');
 
     if (pageRows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#4b5563;font-size:13px;">검색 결과가 없습니다</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:40px;color:#767d8c;font-size:13px;">검색 결과가 없습니다</td></tr>`;
     } else {
       tbody.innerHTML = pageRows.map(r => `
         <tr>
           <td class="mono">${r.id}</td>
-          <td><span style="font-weight:500;color:#f1f0ff">${r.game}</span></td>
+          <td><span style="font-weight:500;color:#ffffff">${r.game}</span></td>
           <td>${r.base}</td>
           <td>${r.notify}</td>
           <td>${r.pay}</td>
-          <td class="right"><span style="color:#22d3ee;font-weight:600;">${r.vx.toLocaleString()}</span> <span style="font-size:10px;color:#4b5563;">VX</span></td>
+          <td class="right"><span style="color:#ffcb48;font-weight:600;">${r.vx.toLocaleString()}</span> <span style="font-size:10px;color:#767d8c;">VX</span></td>
           <td class="right amount positive">$${r.revenue.toLocaleString()}</td>
           <td class="center"><span class="status-badge ${r.status}">${STATUS_LABEL[r.status]}</span></td>
           <td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="openDetail('${r.id}')">상세</button></td>
@@ -2102,23 +2110,23 @@
     document.getElementById('detailTitle').textContent = `${r.game} — 정산 상세`;
     document.getElementById('detailId').textContent = r.id;
 
-    const statusColor = { done:'#34d399', pending:'#a78bfa', processing:'#fb923c', cancelled:'#4b5563' };
+    const statusColor = { done:'#34d399', pending:'#11B9D2', processing:'#fb923c', cancelled:'#4b5563' };
     document.getElementById('detailBody').innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;">
-        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
-          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">VX 판매량</div>
-          <div style="font-size:18px;font-weight:700;color:#22d3ee;">${r.vx.toLocaleString()}<span style="font-size:11px;font-weight:400;color:#4b5563;margin-left:3px;">VX</span></div>
+        <div style="background:#32363c;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#767d8c;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">VX 판매량</div>
+          <div style="font-size:18px;font-weight:700;color:#ffcb48;">${r.vx.toLocaleString()}<span style="font-size:11px;font-weight:400;color:#767d8c;margin-left:3px;">VX</span></div>
         </div>
-        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
-          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">총 플레이 수</div>
-          <div style="font-size:18px;font-weight:700;color:#f1f0ff;">${r.plays.toLocaleString()}</div>
+        <div style="background:#32363c;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#767d8c;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">총 플레이 수</div>
+          <div style="font-size:18px;font-weight:700;color:#ffffff;">${r.plays.toLocaleString()}</div>
         </div>
-        <div style="background:#1c1c32;border-radius:8px;padding:12px 14px;">
-          <div style="font-size:10px;color:#4b5563;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">기여금</div>
+        <div style="background:#32363c;border-radius:8px;padding:12px 14px;">
+          <div style="font-size:10px;color:#767d8c;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">기여금</div>
           <div style="font-size:18px;font-weight:700;color:#34d399;">$${r.revenue.toLocaleString()}</div>
         </div>
       </div>
-      <div style="background:#1c1c32;border-radius:10px;padding:4px 0;">
+      <div style="background:#32363c;border-radius:10px;padding:4px 0;">
         ${[
           ['정산 기준일', r.base],
           ['기여 내역 제공', r.notify],
@@ -2127,12 +2135,12 @@
           ['게임명', r.game],
           ['정산 계좌', '카카오뱅크 3333-••••-••••'],
         ].map(([k,v]) => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(139,92,246,0.08);">
-            <span style="font-size:12px;color:#4b5563;">${k}</span>
-            <span style="font-size:12px;font-weight:500;color:#f1f0ff;">${v}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(17,185,210,0.08);">
+            <span style="font-size:12px;color:#767d8c;">${k}</span>
+            <span style="font-size:12px;font-weight:500;color:#ffffff;">${v}</span>
           </div>`).join('')}
       </div>
-      <div style="font-size:11px;color:#4b5563;margin-top:12px;line-height:1.6;">
+      <div style="font-size:11px;color:#767d8c;margin-top:12px;line-height:1.6;">
         ※ 기여금은 VX 판매량·플레이 지표·재방문율을 종합한 확정값이며, 익월 5일 이내 내역 확정 후 출금 가능합니다.
       </div>`;
     openModal('detailModal');
@@ -2175,7 +2183,7 @@
   function confirmSettle() {
     closeModal('settleModal');
     showToast('✅ <strong>정산 신청 완료</strong><br><span style="font-size:11px;color:#94a3b8">내역 제공: 익월 5일 이내 · 지급: 익월 말 영업일</span>',
-      'linear-gradient(135deg,rgba(139,92,246,0.95),rgba(34,211,238,0.85))');
+      'linear-gradient(135deg,rgba(17,185,210,0.95),rgba(34,211,238,0.85))');
   }
 
   /* ═══════════════════════════════════════════
@@ -2218,8 +2226,8 @@
         {
           label: 'VX 판매량',
           data: [2320, 2610, 2980, 3140, 3486, 1820],
-          backgroundColor: 'rgba(139,92,246,0.4)',
-          borderColor: 'rgba(139,92,246,0.8)',
+          backgroundColor: 'rgba(17,185,210,0.4)',
+          borderColor: 'rgba(17,185,210,0.8)',
           borderWidth: 1.5, borderRadius: 4,
           barPercentage: 0.6, categoryPercentage: 0.7,
           yAxisID: 'y',
@@ -2234,7 +2242,7 @@
           yAxisID: 'y2',
           type: 'line',
           tension: 0.4,
-          pointBackgroundColor: '#22d3ee',
+          pointBackgroundColor: '#ffcb48',
           pointRadius: 4,
         }
       ]
@@ -2246,7 +2254,7 @@
         legend: { display:false },
         tooltip: {
           backgroundColor: 'rgba(13,13,20,0.95)',
-          borderColor: 'rgba(139,92,246,0.3)', borderWidth:1,
+          borderColor: 'rgba(17,185,210,0.3)', borderWidth:1,
           titleColor:'#f1f0ff', bodyColor:'#94a3b8', padding:12,
           callbacks: {
             label: c => c.datasetIndex===0
@@ -2256,8 +2264,8 @@
         }
       },
       scales: {
-        x: { grid:{display:false}, ticks:{color:'#4b5563',font:{size:11}}, border:{color:'rgba(139,92,246,0.1)'} },
-        y: { grid:{color:'rgba(139,92,246,0.07)'}, ticks:{color:'#4b5563',font:{size:11},callback:v=>v+'K VX'}, border:{display:false} },
+        x: { grid:{display:false}, ticks:{color:'#767d8c',font:{size:11}}, border:{color:'rgba(17,185,210,0.1)'} },
+        y: { grid:{color:'rgba(17,185,210,0.07)'}, ticks:{color:'#767d8c',font:{size:11},callback:v=>v+'K VX'}, border:{display:false} },
         y2:{ display:false }
       }
     }
@@ -2272,37 +2280,37 @@
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
           ${[
             {label:'이번 달 마케팅 기여금',val:'$2,951',sub:'+12.4% 전월 대비',color:'#34d399',icon:'🏦'},
-            {label:'이번 달 VX 판매량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#22d3ee',icon:'🪙'},
-            {label:'총 플레이 수',val:'752,000',sub:'+12.1% 전월 대비',color:'#a78bfa',icon:'🎮'},
+            {label:'이번 달 VX 판매량',val:'3,486,200 VX',sub:'+18.3% 전월 대비',color:'#ffcb48',icon:'🪙'},
+            {label:'총 플레이 수',val:'752,000',sub:'+12.1% 전월 대비',color:'#11B9D2',icon:'🎮'},
             {label:'활성 유저',val:'48,320',sub:'+9.3% 전월 대비',color:'#fb923c',icon:'👥'},
           ].map(c=>`
-            <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+            <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:20px 22px;">
               <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
-              <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+              <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
               <div style="font-size:26px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
               <div style="font-size:11px;color:#34d399;">${c.sub}</div>
             </div>`).join('')}
         </div>
         <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:24px;">
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">월별 수익 추이</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">월별 수익 추이</div>
             <div style="display:flex;gap:4px;align-items:flex-end;height:120px;">
               ${[488,574,783,876,995,1124].map((v,i)=>{
                 const months=['12월','1월','2월','3월','4월','5월'];
                 const h=Math.round(v/1124*100);
                 return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;">
-                  <div style="font-size:9px;color:#4b5563;">$${v}</div>
-                  <div style="width:100%;height:${h}px;background:linear-gradient(180deg,rgba(139,92,246,0.7),rgba(34,211,238,0.4));border-radius:4px 4px 0 0;"></div>
-                  <div style="font-size:9px;color:#4b5563;">${months[i]}</div>
+                  <div style="font-size:9px;color:#767d8c;">$${v}</div>
+                  <div style="width:100%;height:${h}px;background:linear-gradient(180deg,rgba(17,185,210,0.7),rgba(255,203,72,0.4));border-radius:4px 4px 0 0;"></div>
+                  <div style="font-size:9px;color:#767d8c;">${months[i]}</div>
                 </div>`;
               }).join('')}
             </div>
           </div>
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">게임별 비중</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:16px;">게임별 비중</div>
             ${[
-              {name:'Cryzen.io',pct:42,color:'#8b5cf6'},
-              {name:'Water Color Sort',pct:28,color:'#22d3ee'},
+              {name:'Cryzen.io',pct:42,color:'#1a92a4'},
+              {name:'Water Color Sort',pct:28,color:'#ffcb48'},
               {name:'Lands of Blight',pct:17,color:'#34d399'},
               {name:'Murder Mystery',pct:13,color:'#fb923c'},
             ].map(g=>`
@@ -2311,24 +2319,24 @@
                   <span style="font-size:11px;color:#94a3b8;">${g.name}</span>
                   <span style="font-size:11px;color:${g.color};font-weight:600;">${g.pct}%</span>
                 </div>
-                <div style="height:4px;background:#1c1c32;border-radius:2px;">
+                <div style="height:4px;background:#32363c;border-radius:2px;">
                   <div style="height:4px;width:${g.pct}%;background:${g.color};border-radius:2px;"></div>
                 </div>
               </div>`).join('')}
           </div>
         </div>
-        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">최근 활동</div>
+        <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:16px;">최근 활동</div>
           ${[
             {icon:'💸',text:'Cryzen.io 4월 정산금 $1,124 지급 완료',time:'3시간 전',color:'#34d399'},
-            {icon:'📋',text:'Water Color Sort 4월 정산 내역 제공됨',time:'어제',color:'#a78bfa'},
-            {icon:'🎮',text:'Count Control Legends 새 버전 배포',time:'2일 전',color:'#22d3ee'},
+            {icon:'📋',text:'Water Color Sort 4월 정산 내역 제공됨',time:'어제',color:'#11B9D2'},
+            {icon:'🎮',text:'Count Control Legends 새 버전 배포',time:'2일 전',color:'#ffcb48'},
             {icon:'👤',text:'신규 유저 1,240명 등록',time:'3일 전',color:'#fb923c'},
           ].map(a=>`
-            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
-              <div style="width:34px;height:34px;background:#1c1c32;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">${a.icon}</div>
+            <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
+              <div style="width:34px;height:34px;background:#32363c;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">${a.icon}</div>
               <div style="flex:1;font-size:12px;color:#94a3b8;">${a.text}</div>
-              <div style="font-size:11px;color:#4b5563;">${a.time}</div>
+              <div style="font-size:11px;color:#767d8c;">${a.time}</div>
             </div>`).join('')}
         </div>
       </div>`;
@@ -2345,28 +2353,28 @@
     el.innerHTML = `
       <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
         <div style="flex:1;">
-          <input placeholder="게임 검색..." style="width:100%;box-sizing:border-box;background:#131322;border:1px solid rgba(139,92,246,0.2);border-radius:8px;padding:9px 14px;color:#f1f0ff;font-size:13px;outline:none;" />
+          <input placeholder="게임 검색..." style="width:100%;box-sizing:border-box;background:#131322;border:1px solid rgba(17,185,210,0.2);border-radius:8px;padding:9px 14px;color:#ffffff;font-size:13px;outline:none;" />
         </div>
         <button class="btn btn-primary" onclick="showToast('🎮 게임 등록 기능은 준비 중입니다.')">+ 게임 등록</button>
       </div>
-      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;overflow:hidden;">
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;overflow:hidden;">
         <table style="width:100%;border-collapse:collapse;">
           <thead>
-            <tr style="background:rgba(139,92,246,0.06);">
-              ${['게임명','엔진','상태','이번 달 플레이','VX 판매량','기여금','활성 유저','최근 업데이트',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#4b5563;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
+            <tr style="background:rgba(17,185,210,0.06);">
+              ${['게임명','엔진','상태','이번 달 플레이','VX 판매량','기여금','활성 유저','최근 업데이트',''].map(h=>`<th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#767d8c;text-transform:uppercase;letter-spacing:0.5px;">${h}</th>`).join('')}
             </tr>
           </thead>
           <tbody>
             ${games.map(g=>`
-              <tr style="border-top:1px solid rgba(139,92,246,0.08);" onmouseover="this.style.background='rgba(139,92,246,0.04)'" onmouseout="this.style.background='transparent'">
-                <td style="padding:14px 16px;font-weight:600;color:#f1f0ff;">${g.name}</td>
-                <td style="padding:14px 16px;font-size:12px;color:#4b5563;">${g.engine}</td>
+              <tr style="border-top:1px solid rgba(17,185,210,0.08);" onmouseover="this.style.background='rgba(17,185,210,0.04)'" onmouseout="this.style.background='transparent'">
+                <td style="padding:14px 16px;font-weight:600;color:#ffffff;">${g.name}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#767d8c;">${g.engine}</td>
                 <td style="padding:14px 16px;"><span style="background:rgba(52,211,153,0.12);color:#34d399;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● 활성</span></td>
-                <td style="padding:14px 16px;font-size:13px;color:#f1f0ff;">${g.plays}</td>
-                <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#22d3ee;">${g.vx} <span style="font-size:10px;font-weight:400;color:#4b5563;">VX</span></td>
+                <td style="padding:14px 16px;font-size:13px;color:#ffffff;">${g.plays}</td>
+                <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#ffcb48;">${g.vx} <span style="font-size:10px;font-weight:400;color:#767d8c;">VX</span></td>
                 <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#34d399;">${g.contrib}</td>
                 <td style="padding:14px 16px;font-size:13px;color:#94a3b8;">${g.users}</td>
-                <td style="padding:14px 16px;font-size:12px;color:#4b5563;">${g.updated}</td>
+                <td style="padding:14px 16px;font-size:12px;color:#767d8c;">${g.updated}</td>
                 <td style="padding:14px 16px;">
                   <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📊 ${g.name} 상세 분석으로 이동합니다.')">분석</button>
                 </td>
@@ -2380,39 +2388,39 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
         ${[
-          {label:'이번 달 광고 수익',val:'~$2,340',sub:'+22.1% 전월 대비',color:'#22d3ee',icon:'📢'},
-          {label:'광고 노출 수',val:'1,842,000',sub:'CPM $1.27',color:'#a78bfa',icon:'👁️'},
+          {label:'이번 달 광고 수익',val:'~$2,340',sub:'+22.1% 전월 대비',color:'#ffcb48',icon:'📢'},
+          {label:'광고 노출 수',val:'1,842,000',sub:'CPM $1.27',color:'#11B9D2',icon:'👁️'},
           {label:'광고 클릭 수',val:'38,420',sub:'CTR 2.09%',color:'#34d399',icon:'🖱️'},
         ].map(c=>`
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:20px 22px;">
             <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
-            <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
             <div style="font-size:26px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
             <div style="font-size:11px;color:#34d399;">${c.sub}</div>
           </div>`).join('')}
       </div>
-      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
-        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:6px;">광고 유형별 수익</div>
-        <div style="font-size:12px;color:#4b5563;margin-bottom:18px;">2026년 5월 기준 (확정값)</div>
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:6px;">광고 유형별 수익</div>
+        <div style="font-size:12px;color:#767d8c;margin-bottom:18px;">2026년 5월 기준 (확정값)</div>
         ${[
-          {type:'동영상 광고 (Rewarded)',rev:'~$1,420',imp:'824,000',fill:'94.2%',color:'#8b5cf6'},
-          {type:'전면 광고 (Interstitial)',rev:'~$680',imp:'521,000',fill:'88.7%',color:'#22d3ee'},
+          {type:'동영상 광고 (Rewarded)',rev:'~$1,420',imp:'824,000',fill:'94.2%',color:'#1a92a4'},
+          {type:'전면 광고 (Interstitial)',rev:'~$680',imp:'521,000',fill:'88.7%',color:'#ffcb48'},
           {type:'배너 광고 (Banner)',rev:'~$240',imp:'497,000',fill:'79.4%',color:'#34d399'},
         ].map(a=>`
-          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
             <div style="width:10px;height:10px;border-radius:50%;background:${a.color};flex-shrink:0;"></div>
-            <div style="flex:1;font-size:13px;color:#f1f0ff;">${a.type}</div>
+            <div style="flex:1;font-size:13px;color:#ffffff;">${a.type}</div>
             <div style="text-align:right;min-width:90px;font-size:13px;font-weight:600;color:#34d399;">${a.rev}</div>
-            <div style="text-align:right;min-width:90px;font-size:12px;color:#4b5563;">노출 ${a.imp}</div>
+            <div style="text-align:right;min-width:90px;font-size:12px;color:#767d8c;">노출 ${a.imp}</div>
             <div style="text-align:right;min-width:70px;font-size:12px;color:#94a3b8;">충전율 ${a.fill}</div>
           </div>`).join('')}
       </div>
-      <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.2);border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
+      <div style="background:rgba(17,185,210,0.06);border:1px solid rgba(255,203,72,0.2);border-radius:12px;padding:16px 20px;display:flex;gap:12px;align-items:flex-start;">
         <span style="font-size:18px;">💡</span>
         <div>
-          <div style="font-size:12px;font-weight:600;color:#22d3ee;margin-bottom:4px;">광고 수익 최적화 팁</div>
+          <div style="font-size:12px;font-weight:600;color:#ffcb48;margin-bottom:4px;">광고 수익 최적화 팁</div>
           <div style="font-size:12px;color:#94a3b8;line-height:1.6;">Rewarded 광고를 게임 내 보상 시스템과 연동하면 평균 34% 더 높은 수익을 기대할 수 있습니다. 광고 배치 최적화 가이드를 참고해 보세요.</div>
-          <button style="margin-top:8px;background:none;border:1px solid rgba(34,211,238,0.3);color:#22d3ee;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;" onclick="showToast('📄 가이드 페이지로 이동합니다.')">가이드 보기 →</button>
+          <button style="margin-top:8px;background:none;border:1px solid rgba(34,211,238,0.3);color:#ffcb48;border-radius:6px;padding:5px 12px;font-size:11px;cursor:pointer;" onclick="showToast('📄 가이드 페이지로 이동합니다.')">가이드 보기 →</button>
         </div>
       </div>`;
   }
@@ -2426,39 +2434,39 @@
           <div style="font-size:12px;color:#94a3b8;line-height:1.6;">Verse8은 글로벌 크리에이터 정산 플랫폼으로, 거주 국가에 따라 원천징수 세율이 다를 수 있습니다. 아래 서류를 제출하여 최적의 세율 혜택을 받으세요.</div>
         </div>
       </div>
-      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
-        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">세금 서류 현황</div>
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+        <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:16px;">세금 서류 현황</div>
         ${[
           {doc:'W-8BEN (비미국 개인)',status:'제출 완료',date:'2026.01.15',color:'#34d399',badge:'done'},
           {doc:'사업자등록증 사본',status:'제출 완료',date:'2026.01.15',color:'#34d399',badge:'done'},
-          {doc:'2025년 지급조서',status:'발급 가능',date:'2026.02.10',color:'#a78bfa',badge:'pending'},
-          {doc:'2026년 1분기 지급조서',status:'발급 예정',date:'2026.07.31',color:'#4b5563',badge:'processing'},
+          {doc:'2025년 지급조서',status:'발급 가능',date:'2026.02.10',color:'#11B9D2',badge:'pending'},
+          {doc:'2026년 1분기 지급조서',status:'발급 예정',date:'2026.07.31',color:'#767d8c',badge:'processing'},
         ].map(d=>`
-          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
             <span style="font-size:18px;">📄</span>
             <div style="flex:1;">
-              <div style="font-size:13px;color:#f1f0ff;font-weight:500;">${d.doc}</div>
-              <div style="font-size:11px;color:#4b5563;margin-top:2px;">${d.date}</div>
+              <div style="font-size:13px;color:#ffffff;font-weight:500;">${d.doc}</div>
+              <div style="font-size:11px;color:#767d8c;margin-top:2px;">${d.date}</div>
             </div>
             <span class="status-badge ${d.badge}">${d.status}</span>
             ${d.badge==='pending'?`<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📥 ${d.doc} 다운로드 시작')">다운로드</button>`:''}
           </div>`).join('')}
       </div>
-      <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-        <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:6px;">원천징수 현황</div>
-        <div style="font-size:12px;color:#4b5563;margin-bottom:16px;">2026년 누계</div>
+      <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+        <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:6px;">원천징수 현황</div>
+        <div style="font-size:12px;color:#767d8c;margin-bottom:16px;">2026년 누계</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
           ${[
             {label:'총 지급액',val:'$6,728',color:'#f1f0ff'},
             {label:'원천징수액',val:'$0',color:'#34d399'},
-            {label:'실 지급액',val:'$6,728',color:'#a78bfa'},
+            {label:'실 지급액',val:'$6,728',color:'#11B9D2'},
           ].map(s=>`
-            <div style="background:#1c1c32;border-radius:10px;padding:14px 16px;text-align:center;">
-              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${s.label}</div>
+            <div style="background:#32363c;border-radius:10px;padding:14px 16px;text-align:center;">
+              <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">${s.label}</div>
               <div style="font-size:20px;font-weight:700;color:${s.color};">${s.val}</div>
             </div>`).join('')}
         </div>
-        <div style="font-size:11px;color:#4b5563;margin-top:12px;line-height:1.6;">※ W-8BEN 제출로 조세조약 적용 중 (한-미 조세조약 0% 적용). 국가별 세율은 상이할 수 있습니다.</div>
+        <div style="font-size:11px;color:#767d8c;margin-top:12px;line-height:1.6;">※ W-8BEN 제출로 조세조약 적용 중 (한-미 조세조약 0% 적용). 국가별 세율은 상이할 수 있습니다.</div>
       </div>`;
   }
 
@@ -2466,21 +2474,21 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
         ${[
-          {label:'총 유저 수',val:'48,320',sub:'+9.3% 전월 대비',color:'#a78bfa',icon:'👥'},
-          {label:'DAU',val:'12,840',sub:'전일 대비 +340',color:'#22d3ee',icon:'📅'},
+          {label:'총 유저 수',val:'48,320',sub:'+9.3% 전월 대비',color:'#11B9D2',icon:'👥'},
+          {label:'DAU',val:'12,840',sub:'전일 대비 +340',color:'#ffcb48',icon:'📅'},
           {label:'월 리텐션',val:'68.4%',sub:'+2.1pp 전월 대비',color:'#34d399',icon:'🔄'},
           {label:'평균 플레이 시간',val:'14.2분',sub:'전월 12.8분',color:'#fb923c',icon:'⏱️'},
         ].map(c=>`
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:20px 22px;">
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:20px 22px;">
             <div style="font-size:22px;margin-bottom:10px;">${c.icon}</div>
-            <div style="font-size:11px;color:#4b5563;margin-bottom:4px;">${c.label}</div>
+            <div style="font-size:11px;color:#767d8c;margin-bottom:4px;">${c.label}</div>
             <div style="font-size:24px;font-weight:700;color:${c.color};margin-bottom:4px;">${c.val}</div>
             <div style="font-size:11px;color:#34d399;">${c.sub}</div>
           </div>`).join('')}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">국가별 유저 분포</div>
+        <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:16px;">국가별 유저 분포</div>
           ${[
             {country:'🇰🇷 대한민국',pct:38,count:'18,362'},
             {country:'🇺🇸 미국',pct:22,count:'10,630'},
@@ -2491,32 +2499,32 @@
             <div style="margin-bottom:10px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
                 <span style="font-size:12px;color:#94a3b8;">${c.country}</span>
-                <span style="font-size:12px;color:#4b5563;">${c.count}명 (${c.pct}%)</span>
+                <span style="font-size:12px;color:#767d8c;">${c.count}명 (${c.pct}%)</span>
               </div>
-              <div style="height:5px;background:#1c1c32;border-radius:3px;">
-                <div style="height:5px;width:${c.pct}%;background:linear-gradient(90deg,#8b5cf6,#22d3ee);border-radius:3px;"></div>
+              <div style="height:5px;background:#32363c;border-radius:3px;">
+                <div style="height:5px;width:${c.pct}%;background:linear-gradient(90deg,#1a92a4,#ffcb48);border-radius:3px;"></div>
               </div>
             </div>`).join('')}
         </div>
-        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-          <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:16px;">플랫폼별 유저</div>
+        <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+          <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:16px;">플랫폼별 유저</div>
           ${[
             {platform:'모바일 (Android)',pct:52,color:'#34d399'},
-            {platform:'모바일 (iOS)',pct:28,color:'#a78bfa'},
-            {platform:'PC/웹',pct:20,color:'#22d3ee'},
+            {platform:'모바일 (iOS)',pct:28,color:'#11B9D2'},
+            {platform:'PC/웹',pct:20,color:'#ffcb48'},
           ].map(p=>`
             <div style="margin-bottom:16px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
                 <span style="font-size:12px;color:#94a3b8;">${p.platform}</span>
                 <span style="font-size:13px;font-weight:600;color:${p.color};">${p.pct}%</span>
               </div>
-              <div style="height:8px;background:#1c1c32;border-radius:4px;">
+              <div style="height:8px;background:#32363c;border-radius:4px;">
                 <div style="height:8px;width:${p.pct}%;background:${p.color};border-radius:4px;opacity:0.8;"></div>
               </div>
             </div>`).join('')}
-          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(139,92,246,0.1);">
-            <div style="font-size:11px;color:#4b5563;margin-bottom:8px;">신규 유저 획득</div>
-            <div style="font-size:24px;font-weight:700;color:#f1f0ff;">+4,820 <span style="font-size:13px;color:#34d399;">이번 달</span></div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(17,185,210,0.1);">
+            <div style="font-size:11px;color:#767d8c;margin-bottom:8px;">신규 유저 획득</div>
+            <div style="font-size:24px;font-weight:700;color:#ffffff;">+4,820 <span style="font-size:13px;color:#34d399;">이번 달</span></div>
           </div>
         </div>
       </div>`;
@@ -2526,7 +2534,7 @@
     el.innerHTML = `
       <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center;">
         <div style="flex:1;">
-          <div style="font-size:13px;color:#94a3b8;">진행 중인 A/B 테스트 <strong style="color:#a78bfa;">3</strong>개 · 완료 <strong style="color:#4b5563;">8</strong>개</div>
+          <div style="font-size:13px;color:#94a3b8;">진행 중인 A/B 테스트 <strong style="color:#11B9D2;">3</strong>개 · 완료 <strong style="color:#767d8c;">8</strong>개</div>
         </div>
         <button class="btn btn-primary" onclick="showToast('🧪 새 A/B 테스트 생성 기능은 준비 중입니다.')">+ 새 테스트</button>
       </div>
@@ -2535,29 +2543,29 @@
         {name:'튜토리얼 흐름 최적화',game:'Water Color Sort',status:'running',start:'2026.04.25',variant_a:'기존 튜토리얼 (5단계)',variant_b:'간소화 (3단계)',conv_a:'61.4%',conv_b:'74.1%',winner:'B',progress:45},
         {name:'홈 화면 레이아웃',game:'Lands of Blight',status:'running',start:'2026.04.28',variant_a:'그리드형',variant_b:'리스트형',conv_a:'8.3%',conv_b:'8.7%',winner:'?',progress:18},
       ].map(t=>`
-        <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
+        <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;margin-bottom:16px;">
           <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
             <span style="background:rgba(52,211,153,0.12);color:#34d399;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:500;">● 진행 중</span>
-            <span style="font-size:14px;font-weight:600;color:#f1f0ff;">${t.name}</span>
-            <span style="font-size:11px;color:#4b5563;margin-left:auto;">${t.game} · ${t.start} ~</span>
+            <span style="font-size:14px;font-weight:600;color:#ffffff;">${t.name}</span>
+            <span style="font-size:11px;color:#767d8c;margin-left:auto;">${t.game} · ${t.start} ~</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
-            <div style="background:#1c1c32;border-radius:10px;padding:14px;${t.winner==='A'?'border:1px solid rgba(34,211,238,0.4);':''}">
-              <div style="font-size:10px;color:#4b5563;margin-bottom:6px;">A: ${t.variant_a}</div>
+            <div style="background:#32363c;border-radius:10px;padding:14px;${t.winner==='A'?'border:1px solid rgba(34,211,238,0.4);':''}">
+              <div style="font-size:10px;color:#767d8c;margin-bottom:6px;">A: ${t.variant_a}</div>
               <div style="font-size:22px;font-weight:700;color:#94a3b8;">${t.conv_a}</div>
-              <div style="font-size:10px;color:#4b5563;margin-top:2px;">전환율</div>
+              <div style="font-size:10px;color:#767d8c;margin-top:2px;">전환율</div>
             </div>
-            <div style="background:#1c1c32;border-radius:10px;padding:14px;${t.winner==='B'?'border:1px solid rgba(139,92,246,0.5);':''}">
-              <div style="font-size:10px;color:#4b5563;margin-bottom:6px;">B: ${t.variant_b}</div>
-              <div style="font-size:22px;font-weight:700;color:${t.winner==='B'?'#a78bfa':'#94a3b8'};">${t.conv_b}</div>
-              <div style="font-size:10px;color:#4b5563;margin-top:2px;">전환율</div>
+            <div style="background:#32363c;border-radius:10px;padding:14px;${t.winner==='B'?'border:1px solid rgba(17,185,210,0.5);':''}">
+              <div style="font-size:10px;color:#767d8c;margin-bottom:6px;">B: ${t.variant_b}</div>
+              <div style="font-size:22px;font-weight:700;color:${t.winner==='B'?'#11B9D2':'#94a3b8'};">${t.conv_b}</div>
+              <div style="font-size:10px;color:#767d8c;margin-top:2px;">전환율</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;height:4px;background:#1c1c32;border-radius:2px;">
-              <div style="height:4px;width:${t.progress}%;background:linear-gradient(90deg,#8b5cf6,#22d3ee);border-radius:2px;"></div>
+            <div style="flex:1;height:4px;background:#32363c;border-radius:2px;">
+              <div style="height:4px;width:${t.progress}%;background:linear-gradient(90deg,#1a92a4,#ffcb48);border-radius:2px;"></div>
             </div>
-            <div style="font-size:11px;color:#4b5563;">진행률 ${t.progress}%</div>
+            <div style="font-size:11px;color:#767d8c;">진행률 ${t.progress}%</div>
             <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('📊 테스트 상세 결과를 확인합니다.')">상세</button>
           </div>
         </div>`).join('')}`;
@@ -2567,34 +2575,34 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
         <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">API 연동</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">API 연동</div>
             <div style="margin-bottom:14px;">
-              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">라이브 API 키</div>
-              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;">
-                <code style="flex:1;font-size:12px;color:#a78bfa;font-family:monospace;">v8_live_pk_placeholder_key</code>
+              <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">라이브 API 키</div>
+              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:8px;padding:8px 12px;">
+                <code style="flex:1;font-size:12px;color:#11B9D2;font-family:monospace;">v8_live_pk_placeholder_key</code>
                 <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;" onclick="copyApiKey()">복사</button>
               </div>
             </div>
             <div>
-              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">테스트 API 키</div>
-              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;">
-                <code style="flex:1;font-size:12px;color:#4b5563;font-family:monospace;">v8_test_sk_placeholder_key</code>
+              <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">테스트 API 키</div>
+              <div style="display:flex;align-items:center;gap:8px;background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:8px;padding:8px 12px;">
+                <code style="flex:1;font-size:12px;color:#767d8c;font-family:monospace;">v8_test_sk_placeholder_key</code>
                 <button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;" onclick="showToast('📋 테스트 키가 복사되었습니다.')">복사</button>
               </div>
             </div>
           </div>
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">Webhook 설정</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">Webhook 설정</div>
             <div style="margin-bottom:12px;">
-              <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">Webhook URL</div>
-              <input placeholder="https://your-server.com/webhook" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+              <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">Webhook URL</div>
+              <input placeholder="https://your-server.com/webhook" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:8px;padding:8px 12px;color:#ffffff;font-size:12px;outline:none;" />
             </div>
             <div style="margin-bottom:16px;">
-              <div style="font-size:11px;color:#4b5563;margin-bottom:8px;">이벤트 구독</div>
+              <div style="font-size:11px;color:#767d8c;margin-bottom:8px;">이벤트 구독</div>
               ${['정산 완료','결제 발생','환불 처리','에러 발생'].map(e=>`
                 <label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;">
-                  <input type="checkbox" ${['정산 완료','결제 발생'].includes(e)?'checked':''} style="accent-color:#8b5cf6;" />
+                  <input type="checkbox" ${['정산 완료','결제 발생'].includes(e)?'checked':''} style="accent-color:#1a92a4;" />
                   <span style="font-size:12px;color:#94a3b8;">${e}</span>
                 </label>`).join('')}
             </div>
@@ -2602,8 +2610,8 @@
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">알림 설정</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">알림 설정</div>
             ${[
               {label:'정산 완료 알림',sub:'정산금 지급 시 이메일 알림',on:true},
               {label:'월간 리포트',sub:'매월 1일 수익 요약 리포트',on:true},
@@ -2611,30 +2619,30 @@
               {label:'신규 유저 알림',sub:'일일 신규 가입 유저 요약',on:false},
               {label:'마케팅 메일',sub:'Verse8 뉴스 및 프로모션 정보',on:false},
             ].map(n=>`
-              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+              <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
                 <div style="flex:1;">
-                  <div style="font-size:12px;color:#f1f0ff;font-weight:500;">${n.label}</div>
-                  <div style="font-size:11px;color:#4b5563;">${n.sub}</div>
+                  <div style="font-size:12px;color:#ffffff;font-weight:500;">${n.label}</div>
+                  <div style="font-size:11px;color:#767d8c;">${n.sub}</div>
                 </div>
-                <div style="position:relative;width:38px;height:22px;background:${n.on?'#8b5cf6':'#1c1c32'};border-radius:11px;cursor:pointer;transition:background 0.2s;"
-                     onclick="this.style.background=this.style.background==='rgb(139, 92, 246)'?'#1c1c32':'#8b5cf6';showToast('설정이 변경되었습니다.')">
+                <div style="position:relative;width:38px;height:22px;background:${n.on?'#1a92a4':'#32363c'};border-radius:11px;cursor:pointer;transition:background 0.2s;"
+                     onclick="this.style.background=this.style.background==='rgb(26, 146, 164)'?'#32363c':'#1a92a4';showToast('설정이 변경되었습니다.')">
                   <div style="position:absolute;top:3px;${n.on?'right:3px':'left:3px'};width:16px;height:16px;background:white;border-radius:50%;transition:all 0.2s;"></div>
                 </div>
               </div>`).join('')}
           </div>
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">보안 설정</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">보안 설정</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
               <div>
-                <div style="font-size:12px;color:#f1f0ff;font-weight:500;">2단계 인증 (2FA)</div>
+                <div style="font-size:12px;color:#ffffff;font-weight:500;">2단계 인증 (2FA)</div>
                 <div style="font-size:11px;color:#34d399;">활성화됨 · Google Authenticator</div>
               </div>
               <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;" onclick="showToast('🔐 2FA 설정 페이지로 이동합니다.')">관리</button>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
               <div>
-                <div style="font-size:12px;color:#f1f0ff;font-weight:500;">로그인 세션</div>
-                <div style="font-size:11px;color:#4b5563;">현재 활성 세션 2개</div>
+                <div style="font-size:12px;color:#ffffff;font-weight:500;">로그인 세션</div>
+                <div style="font-size:11px;color:#767d8c;">현재 활성 세션 2개</div>
               </div>
               <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;color:#f87171;" onclick="showToast('⚠ 다른 기기 세션이 종료되었습니다.')">전체 로그아웃</button>
             </div>
@@ -2647,32 +2655,32 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;">
         <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;text-align:center;">
-            <div style="width:72px;height:72px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;">🎮</div>
-            <div style="font-size:16px;font-weight:700;color:#f1f0ff;margin-bottom:4px;">Verse8 Dev</div>
-            <div style="font-size:12px;color:#4b5563;margin-bottom:16px;">hakyong@planetariumhq.com</div>
-            <span style="background:linear-gradient(90deg,rgba(139,92,246,0.15),rgba(34,211,238,0.1));border:1px solid rgba(139,92,246,0.3);color:#a78bfa;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;">PRO 플랜</span>
-            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(139,92,246,0.1);">
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;text-align:center;">
+            <div style="width:72px;height:72px;background:linear-gradient(135deg,#1a92a4,#ffcb48);border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-size:30px;">🎮</div>
+            <div style="font-size:16px;font-weight:700;color:#ffffff;margin-bottom:4px;">Verse8 Dev</div>
+            <div style="font-size:12px;color:#767d8c;margin-bottom:16px;">hakyong@planetariumhq.com</div>
+            <span style="background:linear-gradient(90deg,rgba(17,185,210,0.15),rgba(255,203,72,0.1));border:1px solid rgba(17,185,210,0.3);color:#11B9D2;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;">PRO 플랜</span>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid rgba(17,185,210,0.1);">
               <button class="btn btn-ghost" style="width:100%;margin-bottom:8px;" onclick="showToast('📷 프로필 이미지 변경')">이미지 변경</button>
             </div>
           </div>
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:12px;font-weight:600;color:#f1f0ff;margin-bottom:14px;">계정 요약</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:12px;font-weight:600;color:#ffffff;margin-bottom:14px;">계정 요약</div>
             ${[
               {label:'가입일',val:'2025. 01. 15'},
               {label:'등록 게임',val:'5개'},
               {label:'총 수익',val:'$6,728'},
               {label:'총 플레이',val:'6,248,000'},
             ].map(s=>`
-              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(139,92,246,0.08);">
-                <span style="font-size:11px;color:#4b5563;">${s.label}</span>
-                <span style="font-size:11px;font-weight:500;color:#f1f0ff;">${s.val}</span>
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(17,185,210,0.08);">
+                <span style="font-size:11px;color:#767d8c;">${s.label}</span>
+                <span style="font-size:11px;font-weight:500;color:#ffffff;">${s.val}</span>
               </div>`).join('')}
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">개인 정보</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">개인 정보</div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
               ${[
                 {label:'표시 이름',val:'Verse8 Dev'},
@@ -2681,26 +2689,26 @@
                 {label:'국가',val:'대한민국'},
               ].map(f=>`
                 <div>
-                  <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${f.label}</div>
-                  <input value="${f.val}" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">${f.label}</div>
+                  <input value="${f.val}" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:8px;padding:8px 12px;color:#ffffff;font-size:12px;outline:none;" />
                 </div>`).join('')}
             </div>
             <button class="btn btn-primary" onclick="showToast('✅ 프로필이 저장되었습니다.')">변경사항 저장</button>
           </div>
-          <div style="background:#131322;border:1px solid rgba(139,92,246,0.15);border-radius:14px;padding:22px;">
-            <div style="font-size:13px;font-weight:600;color:#f1f0ff;margin-bottom:18px;">비밀번호 변경</div>
+          <div style="background:#131322;border:1px solid rgba(17,185,210,0.15);border-radius:14px;padding:22px;">
+            <div style="font-size:13px;font-weight:600;color:#ffffff;margin-bottom:18px;">비밀번호 변경</div>
             <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
               ${['현재 비밀번호','새 비밀번호','새 비밀번호 확인'].map(p=>`
                 <div>
-                  <div style="font-size:11px;color:#4b5563;margin-bottom:6px;">${p}</div>
-                  <input type="password" placeholder="••••••••" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(139,92,246,0.15);border-radius:8px;padding:8px 12px;color:#f1f0ff;font-size:12px;outline:none;" />
+                  <div style="font-size:11px;color:#767d8c;margin-bottom:6px;">${p}</div>
+                  <input type="password" placeholder="••••••••" style="width:100%;box-sizing:border-box;background:#0f0f1e;border:1px solid rgba(17,185,210,0.15);border-radius:8px;padding:8px 12px;color:#ffffff;font-size:12px;outline:none;" />
                 </div>`).join('')}
             </div>
             <button class="btn btn-ghost" onclick="showToast('✅ 비밀번호가 변경되었습니다.')">비밀번호 변경</button>
           </div>
           <div style="background:rgba(248,113,113,0.05);border:1px solid rgba(248,113,113,0.2);border-radius:14px;padding:22px;">
             <div style="font-size:13px;font-weight:600;color:#f87171;margin-bottom:8px;">위험 구역</div>
-            <div style="font-size:12px;color:#4b5563;margin-bottom:14px;">계정을 삭제하면 모든 데이터, 게임, 정산 내역이 영구적으로 제거됩니다.</div>
+            <div style="font-size:12px;color:#767d8c;margin-bottom:14px;">계정을 삭제하면 모든 데이터, 게임, 정산 내역이 영구적으로 제거됩니다.</div>
             <button style="background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.3);color:#f87171;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;" onclick="showToast('⚠ 계정 삭제를 위해서는 고객센터에 문의해주세요.')">계정 삭제 요청</button>
           </div>
         </div>
